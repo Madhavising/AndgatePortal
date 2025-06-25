@@ -6,7 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // 🧩 Internal Imports
 import AppRouter from './router/router';
-import Loading from './components/loading';
+import Loading from './components/Loading';
 import { initializeAuth } from './utils/auth';
 import './App.css';
 
