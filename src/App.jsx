@@ -1,19 +1,42 @@
-import { useState } from 'react'
-import './App.css'
+// 🌐 External Imports
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
 
-function App() {
-  
+// 🧩 Internal Imports
+import AppRouter from './router/router';
+import Loading from './components/loading';
+import { initializeAuth } from './utils/auth';
+import './App.css';
+
+const App = () => {
+  const dispatch = useDispatch();
+
+  const [isAuth, setIsAuth] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    initializeAuth({ dispatch, setIsAuth, setLoading, setError });
+  }, [dispatch]);
+
+  if (loading) return <Loading />;
+
+  if (error) {
+    return (
+      <div className="App text-red-600 p-4">
+        <p>Error: {error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <ToastContainer position="top-right" autoClose={3000} />
-     <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <div className="App">
+      <AppRouter isAuth={isAuth} />
+      <ToastContainer />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
