@@ -1,6 +1,9 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { baseUrl } from "../../api";
+
 
 const experienceSteps = ["Experience Info", "Tech & Offers"];
 
@@ -41,12 +44,39 @@ const CandidateRegistration = () => {
 
   const [formData, setFormData] = useState(initialFormState);
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files } = e.target;
+
+    if (name === 'resume' && files?.length > 0) {
+      const file = files[0];
+      const formDataToSend = new FormData();
+      formDataToSend.append('file', file);
+
+      try {
+        const response = await axios.post(`${baseUrl}/api/upload_resume`, formDataToSend, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        const uploadedPath = response.data?.file?.filePath;
+
+        console.log('Upload success:', uploadedPath);
+
+        setFormData((prev) => ({
+          ...prev,
+          resume: uploadedPath,
+        }));
+      } catch (error) {
+        console.error('Upload error:', error.response?.data || error.message);
+      }
+
+      return;
+    }
 
     setFormData((prev) => ({
       ...prev,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
@@ -121,16 +151,15 @@ const CandidateRegistration = () => {
   };
 
   const handleNextStep = () => {
-    console.log("formData", formData);
     setStep(1);
   };
 
   const submit = () => {
     const fresherValid = validateFresherForm();
     const experiencedValid = isExperienced ? validateExperienceForm() : true;
-
+    
     if (!fresherValid || !experiencedValid) return;
-
+    
     console.log("Submitted Data:", formData);
     toast.success("Registration submitted successfully!");
 
@@ -152,11 +181,10 @@ const CandidateRegistration = () => {
             className="flex flex-col items-center flex-1 relative z-10"
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
-                experienceStep >= index
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-600"
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${experienceStep >= index
+                ? "bg-blue-600 text-white"
+                : "bg-gray-300 text-gray-600"
+                }`}
             >
               {index + 1}
             </div>
@@ -169,12 +197,10 @@ const CandidateRegistration = () => {
         {experienceSteps.map((_, index) => {
           if (index === experienceSteps.length - 1) return null;
 
-          const leftPos = `calc(${
-            (index / (experienceSteps.length - 1)) * 100
-          }% + 16px)`;
-          const segmentWidth = `calc(${
-            100 / (experienceSteps.length - 1)
-          }% - 32px)`;
+          const leftPos = `calc(${(index / (experienceSteps.length - 1)) * 100
+            }% + 16px)`;
+          const segmentWidth = `calc(${100 / (experienceSteps.length - 1)
+            }% - 32px)`;
 
           let background = "#d1d5db"; // gray by default
           if (experienceStep > index) {
@@ -541,13 +567,13 @@ const CandidateRegistration = () => {
 
                 <div className="flex flex-col">
                   <label>
-                    Experience excluding training{" "}
+                    Experience Including training{" "}
                     <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="expExcludingTraining"
-                    value={formData.expExcludingTraining}
+                    name="expIncludingTraining"
+                    value={formData.expIncludingTraining}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required
@@ -666,7 +692,7 @@ const CandidateRegistration = () => {
                   <input
                     type="text"
                     name="companiesAppliedSixMonths"
-                    value={formData.foreignWork}
+                    value={formData.companiesAppliedSixMonths}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required

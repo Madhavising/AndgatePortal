@@ -45,6 +45,7 @@ export const initializeAuth = async ({ dispatch, setIsAuth, setLoading, setError
   const token = localStorage.getItem("token");
 
   if (!isTokenValid(token)) {
+    localStorage.removeItem("token");
     setIsAuth(false);
     setLoading(false);
     return;
@@ -53,17 +54,20 @@ export const initializeAuth = async ({ dispatch, setIsAuth, setLoading, setError
   try {
     const user = await getUserDetails(token);
 
-    if (!user) {
+    if (!user || user.user.portal !== "andgate") {
+      localStorage.removeItem("token");
       setIsAuth(false);
-      return;
+    } else {
+      dispatch(setUser({ ...user, token }));
+      setIsAuth(true);
     }
 
-    dispatch(setUser({ ...user }));
-    setIsAuth(true);
   } catch (err) {
     console.error("Error fetching user details:", err);
     setError(err.message || "Failed to fetch user details.");
+    setIsAuth(false);
   } finally {
     setLoading(false);
   }
 };
+
