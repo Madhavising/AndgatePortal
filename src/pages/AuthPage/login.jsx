@@ -1,231 +1,280 @@
-// import axios from 'axios';
-// import { useState } from 'react';
-// import { baseUrl } from '../../api';
-// import { toast } from 'react-toastify';
-// import styles from './Login.module.css';
-// import { useDispatch } from 'react-redux';
-// import { getUserDetails } from '../../utils/auth';
-// import { setUser } from '../../store/slice/userSclice';
+// import { useState } from "react";
+// import { useNavigate } from "react-router-dom";
+// import { FaEye, FaEyeSlash } from "react-icons/fa";
+// import { toast, ToastContainer } from "react-toastify";
+// import axios from "axios";
+// import { useDispatch } from "react-redux";
+
+// import "react-toastify/dist/ReactToastify.css";
+// import { baseUrl } from "../../api";
+// import { getUserDetails } from "../../utils/auth";
+// import { setUser } from "../../store/slice/userSclice";
 
 // const LoginScreen = () => {
-//     const dispatch = useDispatch();
-//     const [username, setUsername] = useState('');
-//     const [password, setPassword] = useState('');
+//   const [formData, setFormData] = useState({ email: "", password: "" });
+//   const [showPassword, setShowPassword] = useState(false);
+//   const [isLoading, setIsLoading] = useState(false);
 
-//     const handleSubmit = async (e) => {
-//         e.preventDefault();
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
 
-//         if (!username || !password) {
-//             alert('Username and password are required');
-//             return;
-//         }
+//   const handleChange = (e) =>
+//     setFormData({ ...formData, [e.target.name]: e.target.value });
 
-//         const payload = { email: username, password };
+//   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
-//         try {
-//             const { status, data } = await axios.post(`${baseUrl}/api/auth/login`, payload);
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+//     setIsLoading(true);
 
-//             if (status !== 200 || !data.token) {
-//                 throw new Error('Login failed. Please check your credentials.');
-//             }
+//     try {
+//       const { data } = await axios.post(`${baseUrl}/api/auth/login`, formData);
+//       localStorage.setItem("token", data.token);
 
-//             localStorage.setItem("token", data.token);
+//       const user = await getUserDetails(data.token);
+//       dispatch(setUser({ ...user, token: data.token }));
 
-//             const user = await getUserDetails(data.token);
-//             dispatch(setUser({ ...user, token: data.token }));
+//       toast.success("Login successful!");
+//       setTimeout(() => window.location.reload(), 1500);
+//     } catch (err) {
+//       toast.error(err?.response?.data?.message || "Login failed.");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
 
-//             toast.success('Login successful!', {
-//                 position: "top-right",
-//                 autoClose: 5000,
-//                 hideProgressBar: false,
-//             });
-
-//             setTimeout(() => window.location.reload(), 1000);
-
-//         } catch (error) {
-//             console.error('Login Error:', error.message);
-//             alert(error.message || 'An unexpected error occurred.');
-//         }
-//     };
-
-
-//     return (
-//         <div className={styles.loginContainer}>
-//             <div className={styles.imageSection}></div>
-//             <div className={styles.formSection}>
-//                 <form onSubmit={handleSubmit} className={styles.loginForm}>
-//                     <h2 className={styles.title}>Login</h2>
-
-//                     <div className={styles.inputGroup}>
-//                         <label htmlFor="username" className={styles.label}>Username</label>
-//                         <input
-//                             type="text"
-//                             id="username"
-//                             value={username}
-//                             onChange={e => setUsername(e.target.value)}
-//                             className={styles.input}
-//                             required
-//                         />
-//                     </div>
-
-//                     <div className={styles.inputGroup}>
-//                         <label htmlFor="password" className={styles.label}>Password</label>
-//                         <input
-//                             type="password"
-//                             id="password"
-//                             value={password}
-//                             onChange={e => setPassword(e.target.value)}
-//                             className={styles.input}
-//                             required
-//                         />
-//                     </div>
-
-//                     <button type="submit" className={styles.submitButton}>Login</button>
-//                 </form>
-//             </div>
+//   return (
+//     <div className="min-h-screen bg-neutral-900 flex items-center justify-center px-4">
+//       <div className="w-full max-w-md bg-neutral-800 text-white rounded-xl shadow-lg p-8 space-y-6 border border-neutral-700">
+//         <div className="text-center">
+//           <h2 className="text-3xl font-semibold text-white">Sign in to ANDGATE</h2>
+//           <p className="text-sm text-neutral-400">Welcome back! Please login.</p>
 //         </div>
-//     );
+
+//         <form onSubmit={handleSubmit} className="space-y-5">
+//           <div>
+//             <label className="text-sm text-neutral-300">Email</label>
+//             <input
+//               type="email"
+//               name="email"
+//               value={formData.email}
+//               onChange={handleChange}
+//               required
+//               placeholder="you@example.com"
+//               className="w-full mt-1 px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+//             />
+//           </div>
+
+//           <div className="relative">
+//             <label className="text-sm text-neutral-300">Password</label>
+//             <input
+//               type={showPassword ? "text" : "password"}
+//               name="password"
+//               value={formData.password}
+//               onChange={handleChange}
+//               required
+//               placeholder="••••••••"
+//               className="w-full mt-1 px-4 py-2 bg-neutral-700 text-white border border-neutral-600 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
+//             />
+//             <span
+//               onClick={togglePasswordVisibility}
+//               className="absolute top-10 right-3 text-neutral-400 cursor-pointer"
+//             >
+//               {showPassword ? <FaEyeSlash /> : <FaEye />}
+//             </span>
+//           </div>
+
+//           <button
+//             type="submit"
+//             disabled={isLoading}
+//             className={`w-full py-2 rounded-md font-medium transition ${
+//               isLoading
+//                 ? "bg-neutral-600 cursor-not-allowed"
+//                 : "bg-white text-black hover:bg-neutral-200"
+//             }`}
+//           >
+//             {isLoading ? "Logging in..." : "Login"}
+//           </button>
+//         </form>
+
+//         <p className="text-center text-xs text-neutral-500 pt-4">
+//           © {new Date().getFullYear()} ANDGATE IT Solutions. All rights reserved.
+//         </p>
+//       </div>
+
+//       <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+//     </div>
+//   );
 // };
 
 // export default LoginScreen;
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { motion } from "framer-motion";
 
-import { baseUrl } from '../../api';
-import { getUserDetails } from '../../utils/auth';
-import { setUser } from '../../store/slice/userSclice';
+import "react-toastify/dist/ReactToastify.css";
+import { baseUrl } from "../../api";
+import { getUserDetails } from "../../utils/auth";
+import { setUser } from "../../store/slice/userSclice";
 
 const LoginScreen = () => {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const payload = {
-      email: formData.email,
-      password: formData.password,
-    };
+    setIsLoading(true);
 
     try {
-      const response = await axios.post(`${baseUrl}/api/auth/login`, payload);
+      const { data } = await axios.post(`${baseUrl}/api/auth/login`, formData);
+      localStorage.setItem("token", data.token);
 
-      if (!response.status) throw new Error("Authentication failed.");
+      const user = await getUserDetails(data.token);
+      dispatch(setUser({ ...user, token: data.token }));
 
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-
-        try {
-          const user = await getUserDetails(response.data.token);
-          dispatch(setUser({ ...user, token: response.data.token }));
-          toast.success("Login successful!");
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
-        } catch (err) {
-          toast.warning("Login succeeded, but fetching user details failed.");
-        }
-      }
+      toast.success("Login successful!");
+      setTimeout(() => window.location.reload(), 1500);
     } catch (err) {
-      const errorMsg =
-        err.response?.data?.error ||
-        err.response?.data?.message ||
-        err.message ||
-        "An unexpected error occurred";
-      toast.error(errorMsg);
+      toast.error(err?.response?.data?.message || "Login failed.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex font-inter bg-neutral-900 text-white">
       {/* Left Side */}
-      <div className="hidden md:flex flex-1 flex-col justify-center bg-gradient-to-br from-red-950 via-red-900 to-red-800 text-white relative overflow-hidden">
+      <div className="relative hidden md:flex w-1/2 flex-col justify-center items-start px-14 bg-[#0f0f19] overflow-hidden font-sans">
+        {/* Animated Gradient Glow Orbs */}
         <motion.div
-          className="absolute top-10 left-10 w-96 h-96 bg-gradient-to-tr from-red-500 to-yellow-500 opacity-20 rounded-full blur-3xl"
-          animate={{ scale: [1, 1.5, 1], rotate: [0, 360, 0], x: [0, 20, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 opacity-30 blur-3xl"
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 360, 0],
+            x: [0, 40, 0],
+            y: [0, -20, 0],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="relative z-10 text-start px-10">
-          <h1 className="text-5xl font-extrabold mb-4">Welcome AndGate Portal</h1>
-          <p className="text-lg font-medium">Sign in to continue</p>
-        </div>
+
+        {/* Main Text */}
+        <motion.div
+          className="z-10"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-5 leading-tight tracking-tight">
+            Welcome to &nbsp;
+            <span className="text-blue-500">ANDGATE Portal</span>
+          </h1>
+          <p className="text-lg text-neutral-300 max-w-sm">
+            Your all-in-one solution for HR, Candidate Management, and Talent
+            Acquisition.
+          </p>
+          <p className="mt-5 text-sm text-neutral-500">
+            Reliable • Scalable • Efficient
+          </p>
+        </motion.div>
       </div>
 
-      {/* Right Side Form */}
-      <div className="flex-1 flex items-center justify-center bg-white p-6">
-        <div className="max-w-md w-full space-y-6">
-          <h2 className="text-3xl font-bold text-center text-red-600">Welcome Back</h2>
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            <input
-              type="email"
-              name="email"
-              placeholder="Email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-3 bg-gray-100 border rounded-lg"
-            />
+      {/* Right Side (Form) */}
+      <div className="w-full md:w-1/2 flex items-center justify-center px-6 py-12 bg-gradient-to-br bg-gray-300">
+        <div className="w-full max-w-md bg-[#26263b] p-8 rounded-xl shadow-2xl border border-neutral-700">
+          <div className="mb-6 text-center">
+            <h2 className="text-2xl font-bold text-white">Sign In </h2>
+
+            <p className="text-sm text-neutral-400 mt-2">
+              Enter your credentials below
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-neutral-300 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder=""
+                className="w-full px-4 py-2.5 rounded-md bg-[#1e1e2f] text-white border border-neutral-600 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm focus:shadow-md"
+              />
+            </div>
+
             <div className="relative">
+              <label className="block text-sm font-medium text-neutral-300 mb-1">
+                Password
+              </label>
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Password"
-                required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full p-3 bg-gray-100 border rounded-lg"
+                required
+                placeholder=""
+                className="w-full px-4 py-2.5 rounded-md bg-[#1e1e2f] text-white border border-neutral-600 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm focus:shadow-md"
               />
               <span
-                className="absolute right-3 top-4 cursor-pointer text-gray-600"
                 onClick={togglePasswordVisibility}
+                className="absolute right-3 top-10 text-neutral-400 cursor-pointer"
               >
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
+
+            {/* Forgot Password */}
+            <div className="text-right">
+              <button
+                type="button"
+                onClick={() => navigate("/forgot-password")}
+                className="text-sm text-blue-500 hover:underline hover:text-blue-400 transition"
+              >
+                Forgot password?
+              </button>
+            </div>
+
+            {/* Login Button */}
             <button
               type="submit"
-              className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition"
+              disabled={isLoading}
+              className={`w-full py-2.5 rounded-md font-semibold text-sm transition-all duration-300 ${
+                isLoading
+                  ? "bg-neutral-600 text-neutral-400 cursor-not-allowed"
+                  : "bg-blue-600 text-white hover:bg-blue-700"
+              }`}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
+
+          <p className="text-xs text-center text-neutral-500 mt-6">
+            © {new Date().getFullYear()} ANDGATE IT Solutions. All rights
+            reserved.
+          </p>
         </div>
       </div>
 
-      {/* Toast Container */}
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
     </div>
   );
 };
 
 export default LoginScreen;
-

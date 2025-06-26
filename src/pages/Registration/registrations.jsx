@@ -2,11 +2,15 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+const experienceSteps = ["Experience Info", "Tech & Offers"];
+
 const CandidateRegistration = () => {
   const [isExperienced, setIsExperienced] = useState(false);
   const [step, setStep] = useState(0);
   const [experienceStep, setExperienceStep] = useState(0);
-  const [formData, setFormData] = useState({
+  const [submitted, setSubmitted] = useState(false);
+
+  const initialFormState = {
     email: "",
     poc: "",
     name: "",
@@ -16,264 +20,430 @@ const CandidateRegistration = () => {
     domain: "",
     preferredLocation: "",
     availability: "",
-    resume: null,
+    resume: "",
     experienceYears: "",
     selfRating: "",
     individualRole: "",
     bondDetails: "",
     bondWilling: "",
-    totalExperience: "",
+    releventExp: "",
+    expIncludingTraining: "",
     jobChangeReason: "",
     interviewsAttended: "",
     foreignWork: "",
     skills: "",
-    ctcDetails: "",
-    offerDetails: "",
-  });
+    companiesAppliedSixMonths: "",
 
-  const experienceSteps = ["Experience Info", "Tech & Offers"];
+    currentCTC: "",
+    expectedCTC: "",
+    offerDetails: "",
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: files ? files[0] : value,
     }));
   };
 
-  const submit = () => {
-    console.log("Submitted", formData);
-    toast.success("Registration submitted!");
+  const validateFresherForm = () => {
+    const {
+      email,
+      name,
+      mobile,
+      degree,
+      domain,
+      preferredLocation,
+      availability,
+      resume,
+      skills,
+    } = formData;
+
+    if (
+      !email ||
+      !name ||
+      !mobile ||
+      !degree ||
+      !domain ||
+      !preferredLocation ||
+      !availability ||
+      !resume ||
+      !skills
+    ) {
+      toast.error("Please fill all required fresher fields.");
+      return false;
+    }
+    return true;
   };
 
-  const renderStyledStepper = () => (
-    <div className="w-full flex items-center justify-between relative mb-6 px-2">
-      {experienceSteps.map((label, index) => (
-        <div
-          key={index}
-          className="flex flex-col items-center flex-1 relative z-10"
-        >
+  const validateExperienceForm = () => {
+    const {
+      experienceYears,
+      selfRating,
+      individualRole,
+      bondDetails,
+      bondWilling,
+      releventExp,
+      expIncludingTraining,
+      jobChangeReason,
+      interviewsAttended,
+      foreignWork,
+      currentCTC,
+      expectedCTC,
+      offerDetails,
+      companiesAppliedSixMonths,
+    } = formData;
+
+    if (
+      !experienceYears ||
+      !selfRating ||
+      !individualRole ||
+      !bondDetails ||
+      !bondWilling ||
+      !releventExp ||
+      !expIncludingTraining ||
+      !jobChangeReason ||
+      !interviewsAttended ||
+      !foreignWork ||
+      !currentCTC ||
+      !expectedCTC ||
+      !offerDetails ||
+      !companiesAppliedSixMonths
+    ) {
+      toast.error("Please fill all required experience fields.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleNextStep = () => {
+    console.log("formData", formData);
+    setStep(1);
+  };
+
+  const submit = () => {
+    const fresherValid = validateFresherForm();
+    const experiencedValid = isExperienced ? validateExperienceForm() : true;
+
+    if (!fresherValid || !experiencedValid) return;
+
+    console.log("Submitted Data:", formData);
+    toast.success("Registration submitted successfully!");
+
+    setFormData(initialFormState);
+    setIsExperienced(false);
+    setStep(0);
+    setExperienceStep(0);
+    setSubmitted(true);
+
+    setTimeout(() => setSubmitted(false), 3000);
+  };
+
+  const renderStyledStepper = () => {
+    return (
+      <div className="w-full flex items-center justify-between relative mb-6 px-2">
+        {experienceSteps.map((label, index) => (
           <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
-              experienceStep === index
-                ? "bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-600"
-            }`}
+            key={index}
+            className="flex flex-col items-center flex-1 relative z-10"
           >
-            {index + 1}
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                experienceStep >= index
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-600"
+              }`}
+            >
+              {index + 1}
+            </div>
+            <span className="text-sm text-center mt-2 font-medium text-gray-800">
+              {label}
+            </span>
           </div>
-          <span className="text-sm text-center mt-2 font-medium text-gray-800">
-            {label}
-          </span>
-        </div>
-      ))}
-      <div className="absolute top-4 left-4 right-4 h-0.5 bg-gray-300 z-0" />
-      <div
-        className="absolute top-4 left-4 h-0.5 bg-blue-600 z-0 transition-all duration-300"
-        style={{
-          width: `${(experienceStep / (experienceSteps.length - 1)) * 100}%`,
-        }}
-      />
-    </div>
-  );
+        ))}
+
+        {experienceSteps.map((_, index) => {
+          if (index === experienceSteps.length - 1) return null;
+
+          const leftPos = `calc(${
+            (index / (experienceSteps.length - 1)) * 100
+          }% + 16px)`;
+          const segmentWidth = `calc(${
+            100 / (experienceSteps.length - 1)
+          }% - 32px)`;
+
+          let background = "#d1d5db"; // gray by default
+          if (experienceStep > index) {
+            background = "#2563eb"; // fully blue if past this segment
+          } else if (experienceStep === index) {
+            background = "linear-gradient(to right, #2563eb 50%, #d1d5db 50%)"; // half-filled
+          }
+
+          return (
+            <div
+              key={index}
+              className="absolute top-4 h-0.5 z-0 transition-all duration-300"
+              style={{
+                left: leftPos,
+                width: segmentWidth,
+                background, // ✅ use "background" instead of "backgroundColor"
+              }}
+            />
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4 py-10 flex justify-center overflow-hidden">
+    <div className="min-h-screen bg-gray-100 px-4 py-10 flex  justify-center overflow-hidden">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full max-w-5xl bg-white shadow-xl rounded-2xl p-4 space-y-8">
         <h2 className="text-2xl font-semibold text-gray-800 text-center">
           Candidate Registration Form
         </h2>
 
-        {/* Step 0: Fresher Form */}
-        {step === 0 && (
+        {submitted ? (
+          <div className="text-center  text-green-700 text-lg font-semibold py-20 space-y-4">
+            <div className="mt-10">
+              🎉 Your form has been successfully submitted!
+            </div>
+            <div>
+              Thank you for registering with{" "}
+              <strong>AndGate Informatics Pvt Ltd.</strong>.
+            </div>
+            <div className="text-base text-gray-700 font-normal">
+              Our HR team will review your details shortly. If your profile
+              matches our requirements, you will hear from us via email or
+              phone.
+            </div>
+            <div className="text-base text-gray-700 font-normal">
+              In the meantime, feel free to explore our website or connect with
+              us on LinkedIn for the latest updates and opportunities.
+            </div>
+            <div className="text-sm text-gray-500 italic">
+              We appreciate your interest and wish you the very best in your
+              career journey!
+            </div>
+          </div>
+        ) : (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
-              <div className="flex flex-col">
-                <label>
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>POC in ANDGATE (TA's name)</label>
-                <input
-                  type="text"
-                  name="poc"
-                  value={formData.poc}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Full Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Mobile Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="tel"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>Graduation Year</label>
-                <input
-                  type="month"
-                  name="graduationYear"
-                  value={formData.graduationYear}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Degree <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="degree"
-                  value={formData.degree}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="B.Tech">B.Tech</option>
-                  <option value="M.Tech">M.Tech</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Domain <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="domain"
-                  value={formData.domain}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                >
-                  <option value="">Select</option>
-                  <option value="DFT">DFT</option>
-                  <option value="PD">PD</option>
-                  <option value="DV">DV</option>
-                  <option value="PDK">PDK</option>
-                  <option value="Analog Mixed Signaling">
-                    Analog Mixed Signaling
-                  </option>
-                  <option value="Analog Layout Design">
-                    Analog Layout Design
-                  </option>
-                  <option value="Design Engineer">Design Engineer</option>
-                  <option value="Synthesis">Synthesis</option>
-                  <option value="Physical Verification">
-                    Physical Verification
-                  </option>
-                  <option value="Embedded">Embedded</option>
-                  <option value="FPGA">FPGA</option>
-                  <option value="Design">Design</option>
-                  <option value="Analog Design">Analog Design</option>
-                  <option value="Formal Verification">
-                    Formal Verification
-                  </option>
-                  <option value="Software">Software</option>
-                  <option value="STA">STA</option>
-                  <option value="STA">Others</option>
-                </select>
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Preferred Location <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="preferredLocation"
-                  value={formData.preferredLocation}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Availability / Notice Period{" "}
-                  <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="availability"
-                  value={formData.availability}
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-              <div className="flex flex-col">
-                <label>
-                  Upload Resume <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="file"
-                  name="resume"
-                  onChange={handleChange}
-                  className="border px-3 py-2 rounded"
-                  required
-                />
-              </div>
-            </div>
+            {/* Step 0: Fresher Form */}
+            {step === 0 && (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
+                  <div className="flex flex-col">
+                    <label>
+                      Email <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>POC in ANDGATE (TA's name)</label>
+                    <input
+                      type="text"
+                      name="poc"
+                      value={formData.poc}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Full Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Mobile Number <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="mobile"
+                      value={formData.mobile}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>Graduation Year</label>
+                    <input
+                      type="month"
+                      name="graduationYear"
+                      value={formData.graduationYear}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Degree <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="degree"
+                      value={formData.degree}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="B.Tech">B.Tech</option>
+                      <option value="M.Tech">M.Tech</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Domain <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="domain"
+                      value={formData.domain}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="DFT">DFT</option>
+                      <option value="PD">PD</option>
+                      <option value="DV">DV</option>
+                      <option value="PDK">PDK</option>
+                      <option value="Analog Mixed Signaling">
+                        Analog Mixed Signaling
+                      </option>
+                      <option value="Analog Layout Design">
+                        Analog Layout Design
+                      </option>
+                      <option value="Design Engineer">Design Engineer</option>
+                      <option value="Synthesis">Synthesis</option>
+                      <option value="Physical Verification">
+                        Physical Verification
+                      </option>
+                      <option value="Embedded">Embedded</option>
+                      <option value="FPGA">FPGA</option>
+                      <option value="Design">Design</option>
+                      <option value="Analog Design">Analog Design</option>
+                      <option value="Formal Verification">
+                        Formal Verification
+                      </option>
+                      <option value="Software">Software</option>
+                      <option value="STA">STA</option>
+                      <option value="STA">Others</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Technical skills, tools, strengths{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="skills"
+                      value={formData.skills}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Preferred Location <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="preferredLocation"
+                      value={formData.preferredLocation}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Availability / Notice Period{" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="availability"
+                      value={formData.availability}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                  <div className="flex flex-col">
+                    <label>
+                      Upload Resume <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="file"
+                      name="resume"
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div className="flex items-center space-x-3 pt-6">
-              <label className="text-sm font-medium text-gray-700">
-                Are you an experienced candidate?
-              </label>
-              <input
-                type="checkbox"
-                checked={isExperienced}
-                onChange={() => setIsExperienced(!isExperienced)}
-                className="h-5 w-5 text-blue-600"
-              />
-            </div>
+                <div>
+                  <div className="flex items-center space-x-3 ">
+                    <label className="text-sm font-medium text-gray-700">
+                      Are you an experienced candidate?
+                    </label>
+                    <input
+                      type="checkbox"
+                      checked={isExperienced}
+                      onChange={() => setIsExperienced(!isExperienced)}
+                      className="h-5 w-5 text-blue-600"
+                    />
+                  </div>
 
-            <div className="pt-5 text-end">
-              {isExperienced ? (
-                <button
-                  onClick={() => setStep(1)}
-                  className="bg-blue-600 text-white px-6 pt-2 py-2 rounded-lg"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  onClick={submit}
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg"
-                >
-                  Submit
-                </button>
-              )}
-            </div>
+                  <div className=" text-end">
+                    {isExperienced ? (
+                      <button
+                        onClick={handleNextStep}
+                        className="bg-blue-600 text-white px-6  py-2 rounded-lg"
+                      >
+                        Next
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (validateFresherForm()) {
+                            setStep(1);
+                            setSubmitted(true);
+                          }
+                        }}
+                        className="bg-green-600 text-white px-6  py-2 rounded-lg"
+                      >
+                        Submit
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
           </>
         )}
 
@@ -376,8 +546,8 @@ const CandidateRegistration = () => {
                   </label>
                   <input
                     type="text"
-                    name="totalExperience"
-                    value={formData.totalExperience}
+                    name="expExcludingTraining"
+                    value={formData.expExcludingTraining}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required
@@ -385,13 +555,13 @@ const CandidateRegistration = () => {
                 </div>
                 <div className="flex flex-col">
                   <label>
-                    Relevant Experience including training"{" "}
+                    Relevant Experience
                     <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="totalExperience"
-                    value={formData.totalExperience}
+                    name="releventExp"
+                    value={formData.releventExp}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required
@@ -449,27 +619,12 @@ const CandidateRegistration = () => {
 
                 <div className="flex flex-col">
                   <label>
-                    Technical skills, tools, strengths{" "}
-                    <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="skills"
-                    value={formData.skills}
-                    onChange={handleChange}
-                    className="border px-3 py-2 rounded"
-                    required
-                  />
-                </div>
-
-                <div className="flex flex-col">
-                  <label>
                     Current CTC <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    name="ctcDetails"
-                    value={formData.ctcDetails}
+                    name="currentCTC"
+                    value={formData.currentCTC}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required
@@ -481,8 +636,8 @@ const CandidateRegistration = () => {
                   </label>
                   <input
                     type="text"
-                    name="ctcDetails"
-                    value={formData.ctcDetails}
+                    name="expectedCTC"
+                    value={formData.expectedCTC}
                     onChange={handleChange}
                     className="border px-3 py-2 rounded"
                     required
@@ -503,10 +658,24 @@ const CandidateRegistration = () => {
                     required
                   />
                 </div>
+                <div className="flex flex-col">
+                  <label>
+                    Companies you have applied within last 6 months
+                    <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="companiesAppliedSixMonths"
+                    value={formData.foreignWork}
+                    onChange={handleChange}
+                    className="border px-3 py-2 rounded"
+                    required
+                  />
+                </div>
               </div>
             )}
 
-            <div className="flex justify-between pt-14">
+            <div className="flex justify-between pt-20">
               <button
                 onClick={() =>
                   experienceStep === 0

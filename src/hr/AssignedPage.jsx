@@ -1,16 +1,22 @@
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
 
 const AssignedCandidatePage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const candidate = location.state?.assignedCandidate;
+  const [assignedList, setAssignedList] = useState([]);
 
-  if (!candidate) {
+  useEffect(() => {
+    const stored = localStorage.getItem("assignedCandidates");
+    if (stored) {
+      setAssignedList(JSON.parse(stored));
+    }
+  }, []);
+
+  if (assignedList.length === 0) {
     return (
       <div className="p-6 text-gray-600">
-        <p>No candidate data found.</p>
+        <p>No assigned candidates found.</p>
         <button
           onClick={() => navigate(-1)}
           className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
@@ -22,19 +28,35 @@ const AssignedCandidatePage = () => {
     );
   }
 
+  const renderStatusBadge = (status) => {
+  let color = "bg-gray-100 text-gray-700";
+  if (status === "Resume Shortlisted") color = "bg-yellow-100 text-yellow-800";
+  else if (status === "Interview Cleared") color = "bg-green-100 text-green-800";
+  else if (status === "HR Round Cleared") color = "bg-blue-100 text-blue-800";
+  else if (status === "Selected for Offer") color = "bg-indigo-100 text-indigo-800";
+  else if (status === "Rejected") color = "bg-red-100 text-red-800";
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen font-inter">
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+      {status}
+    </span>
+  );
+};
+
+
+  return (
+    <div className="p-6 bg-gray-50 font-inter h-full overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-3xl font-semibold text-gray-800 tracking-tight">
+        <div className="flex items-center justify-between mb-8 border-b pb-4">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
             Assigned Candidate Details
           </h2>
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-sm text-blue-600 hover:underline"
+            className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors duration-200"
           >
-            <FaArrowLeft />
-            Back
+            <FaArrowLeft className="text-base" />
+            <span>Back to List</span>
           </button>
         </div>
 
@@ -52,46 +74,51 @@ const AssignedCandidatePage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 text-gray-800 font-medium">
-                  {candidate.name}
-                </td>
-                <td className="px-6 py-4 text-gray-700">{candidate.email}</td>
-                <td className="px-6 py-4 text-gray-700">{candidate.mobile}</td>
-                <td className="px-6 py-4 text-gray-700">{candidate.domain}</td>
-                <td className="px-6 py-4">
-                  <span className="text-blue-600 font-semibold">
-                    {candidate.status || "Pending"}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  {candidate.resume ? (
-                    <a
-                      href={`/resumes/${candidate.resume}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 underline"
-                    >
-                      {candidate.resume}
-                    </a>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-                <td className="px-6 py-4">
-                  {candidate.resume ? (
-                    <a
-                      href={`/resumes/${candidate.resume}`}
-                      download
-                      className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium"
-                    >
-                      Download
-                    </a>
-                  ) : (
-                    "—"
-                  )}
-                </td>
-              </tr>
+              {assignedList.map((candidate) => (
+                <tr key={candidate.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 text-gray-800 font-medium">
+                    {candidate.name}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">{candidate.email}</td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {candidate.mobile}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {candidate.domain}
+                  </td>
+                 <td className="px-6 py-4">
+  {renderStatusBadge(candidate.status || "Resume Shortlisted")}
+</td>
+
+                  <td className="px-6 py-4">
+                    {candidate.resume ? (
+                      <a
+                        href={`/resumes/${candidate.resume}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 underline"
+                      >
+                        {candidate.resume}
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="px-6 py-4">
+                    {candidate.resume ? (
+                      <a
+                        href={`/resumes/${candidate.resume}`}
+                        download
+                        className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium"
+                      >
+                        Download
+                      </a>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

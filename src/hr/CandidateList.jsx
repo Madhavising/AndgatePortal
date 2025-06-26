@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 
 import { toast } from "react-toastify";
 
+const currentHR = "Madhavi Singh";
+
 const mockCandidates = [
   {
     id: 1,
@@ -22,30 +24,130 @@ const mockCandidates = [
     individualRole: "Yes",
     bondDetails: "6 months left, ₹1.5 lakh",
     bondWilling: "Maybe (with conditions)",
-    totalExperience: "2 years",
+    expExcludingTraining: "2 year",
+    expIncludingTraining: "3 year",
     jobChangeReason: "Growth and better learning opportunities",
-    locationPreference: "India only",
     interviewsAttended: "ABC Corp - DV, XYZ Inc - STA",
     foreignWork: "No",
     skills: "SystemVerilog, UVM, Git, Scripting",
-    ctcDetails: "CTC: ₹6 LPA | ECTC: ₹8 LPA | NP: 30 Days",
+    currentCTC: "₹8 LPA",
+    expectedCTC: "₹10 LPA",
     offerDetails: "Yes, CompanyX - ₹8 LPA",
     status: "Pending",
+    isAssigned: false,
+    assignedBy: "",
+  },
+  {
+    id: 2,
+    email: "keshav@example.com",
+    poc: "Anand Sharma",
+    name: "Keshav Singh",
+    mobile: "9876543210",
+    graduationYear: "2022",
+    degree: "M.Tech",
+    domain: "DV",
+    preferredLocation: "Bangalore, Pune",
+    availability: "Immediate",
+    resume: "keshav_resume.pdf",
+    experienceYears: "2 years 6 months",
+    selfRating: "8/10 at 3 years",
+    individualRole: "Yes",
+    bondDetails: "6 months left, ₹1.5 lakh",
+    bondWilling: "Maybe (with conditions)",
+    expExcludingTraining: "2 year",
+    expIncludingTraining: "3 year",
+    jobChangeReason: "Growth and better learning opportunities",
+    interviewsAttended: "ABC Corp - DV, XYZ Inc - STA",
+    foreignWork: "No",
+    skills: "SystemVerilog, UVM, Git, Scripting",
+    currentCTC: "₹8 LPA",
+    expectedCTC: "₹10 LPA",
+    offerDetails: "Yes, CompanyX - ₹8 LPA",
+    status: "Pending",
+    isAssigned: false,
+    assignedBy: "",
+  },
+  {
+    id: 3,
+    email: "keshav@example.com",
+    poc: "Anand Sharma",
+    name: "Keshav Singh",
+    mobile: "9876543210",
+    graduationYear: "2022",
+    degree: "M.Tech",
+    domain: "DV",
+    preferredLocation: "Bangalore, Pune",
+    availability: "Immediate",
+    resume: "keshav_resume.pdf",
+    experienceYears: "2 years 6 months",
+    selfRating: "8/10 at 3 years",
+    individualRole: "Yes",
+    bondDetails: "6 months left, ₹1.5 lakh",
+    bondWilling: "Maybe (with conditions)",
+    expExcludingTraining: "2 year",
+    expIncludingTraining: "3 year",
+    jobChangeReason: "Growth and better learning opportunities",
+    interviewsAttended: "ABC Corp - DV, XYZ Inc - STA",
+    foreignWork: "No",
+    skills: "SystemVerilog, UVM, Git, Scripting",
+    currentCTC: "₹8 LPA",
+    expectedCTC: "₹10 LPA",
+    offerDetails: "Yes, CompanyX - ₹8 LPA",
+    status: "Pending",
+    isAssigned: false,
+    assignedBy: "",
   },
 ];
 
 const CandidateList = () => {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [assignedCandidate, setAssignedCandidate] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    setCandidates(mockCandidates);
+    const assigned =
+      JSON.parse(localStorage.getItem("assignedCandidates")) || [];
+
+    const updated = mockCandidates.map((candidate) => {
+      const assignedMatch = assigned.find((a) => a.id === candidate.id);
+      return assignedMatch
+        ? {
+            ...candidate,
+            isAssigned: true,
+            status: assignedMatch.status,
+            assignedBy: assignedMatch.assignedBy,
+          }
+        : candidate;
+    });
+
+    setCandidates(updated);
   }, []);
 
-  const handleAssign = (candidate) => {
-    toast.success("Candidate assigned to you.");
-    navigate("/assigned", { state: { assignedCandidate: candidate } });
+  const handleAssign = (candidateId) => {
+    const updatedCandidates = candidates.map((c) =>
+      c.id === candidateId
+        ? {
+            ...c,
+            isAssigned: true,
+            assignedBy: currentHR,
+            status: `Assigned to ${currentHR}`,
+          }
+        : c
+    );
+
+    const justAssigned = updatedCandidates.find((c) => c.id === candidateId);
+    setCandidates(updatedCandidates);
+
+    // ✅ Store multiple assigned candidates in localStorage
+    const stored = JSON.parse(localStorage.getItem("assignedCandidates")) || [];
+    const updatedList = [
+      ...stored.filter((c) => c.id !== candidateId),
+      justAssigned,
+    ];
+    localStorage.setItem("assignedCandidates", JSON.stringify(updatedList));
+
+    toast.success(`Assigned to you (${currentHR})`);
   };
 
   const Info = ({ label, value }) => (
@@ -57,9 +159,11 @@ const CandidateList = () => {
 
   return (
     <div className="p-6 font-inter bg-[#f8fafc] min-h-screen">
-      <h2 className="text-3xl font-semibold text-gray-800 mb-6 tracking-tight">
-        Candidate Review Panel
-      </h2>
+      <div className="mb-6 pb-2 border-b border-gray-200">
+        <h2 className="text-xl md:text-2xl font-bold text-gray-900 tracking-tight">
+          Candidate Submission Panel
+        </h2>
+      </div>
 
       <div className="overflow-x-auto rounded-lg shadow border border-gray-200 bg-white">
         <table className="min-w-full text-sm text-left">
@@ -89,16 +193,25 @@ const CandidateList = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => setSelectedCandidate(candidate)}
-                      className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5  text-sm"
+                      disabled={candidate.isAssigned}
+                      className={`flex items-center gap-2 px-4 py-2 text-sm ${
+                        candidate.isAssigned
+                          ? "bg-gray-300 cursor-not-allowed"
+                          : "bg-blue-500 hover:bg-blue-600 text-white"
+                      }`}
                     >
-                      <FaEye className="text-white text-lg" />
+                      <FaEye />
                     </button>
-
                     <button
-                      onClick={() => handleAssign(candidate)}
-                      className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-1.5 text-sm"
+                      onClick={() => handleAssign(candidate.id)}
+                      disabled={candidate.isAssigned}
+                      className={`px-4 py-1.5 text-sm font-semibold ${
+                        candidate.isAssigned
+                          ? "bg-gray-400 cursor-not-allowed text-white"
+                          : "bg-yellow-500 hover:bg-yellow-600 text-white"
+                      }`}
                     >
-                      Assign to Me
+                      {candidate.isAssigned ? "Assigned" : "Assign to Me"}
                     </button>
                   </div>
                 </td>
@@ -208,16 +321,16 @@ const CandidateList = () => {
                     value={selectedCandidate.bondWilling}
                   />
                   <Info
-                    label="Total Experience"
-                    value={selectedCandidate.totalExperience}
+                    label="Experience Excluding Training"
+                    value={selectedCandidate.expExcludingTraining}
+                  />
+                  <Info
+                    label="Experience Including Training"
+                    value={selectedCandidate.expIncludingTraining}
                   />
                   <Info
                     label="Job Change Reason"
                     value={selectedCandidate.jobChangeReason}
-                  />
-                  <Info
-                    label="Location Preference"
-                    value={selectedCandidate.locationPreference}
                   />
                   <Info
                     label="Interviews Attended"
@@ -230,7 +343,11 @@ const CandidateList = () => {
                   <Info label="Skills" value={selectedCandidate.skills} />
                   <Info
                     label="CTC Details"
-                    value={selectedCandidate.ctcDetails}
+                    value={selectedCandidate.currentCTC}
+                  />
+                  <Info
+                    label="expectedCTC Details"
+                    value={selectedCandidate.expectedCTC}
                   />
                   <Info
                     label="Offers in Hand"
