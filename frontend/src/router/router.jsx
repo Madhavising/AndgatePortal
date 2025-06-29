@@ -15,6 +15,7 @@ import Approvals from "../hr/Approvals";
 import HrSettings from "../hr/HrSetting";
 import HrDashboard from "../hr/HrDashboard";
 import AssignedCandidatePage from "../hr/AssignedPage";
+import Unauthorized from "../pages/unauthorized";
 
 // import UserDashboard from '../pages/UserPage/userDashboard';
 // import SuperAdminPanel from '../pages/SuperAdmin/panel';
@@ -73,7 +74,7 @@ const AppRouter = ({ isAuth }) => {
       </Route>
 
       {/* Unauthorized */}
-      {/* <Route path="/unauthorized" element={<Unauthorized />} /> */}
+      <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Catch-All */}
       <Route

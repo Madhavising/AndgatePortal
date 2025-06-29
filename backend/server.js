@@ -1,0 +1,28 @@
+
+
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const path = require('path');
+const dbConnection = require("./src/db/dbConnection");
+const portalRoutes = require('./src/routes/portalRoutes');
+const authRoutes = require("./src/routes/authRoutes");
+
+
+dotenv.config();
+
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
+app.use("/api/auth", authRoutes);
+app.use('/api', portalRoutes);
+
+app.use("/src/uploads", express.static(path.join(__dirname, "src/uploads")));
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+    dbConnection();
+});

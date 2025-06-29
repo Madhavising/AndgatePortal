@@ -53,15 +53,8 @@ export const initializeAuth = async ({ dispatch, setIsAuth, setLoading, setError
 
   try {
     const user = await getUserDetails(token);
-
-    if (!user || user.user.portal !== "andgate") {
-      localStorage.removeItem("token");
-      setIsAuth(false);
-    } else {
-      dispatch(setUser({ ...user, token }));
-      setIsAuth(true);
-    }
-
+    dispatch(setUser({ ...user, token }));
+    setIsAuth(true);
   } catch (err) {
     console.error("Error fetching user details:", err);
     setError(err.message || "Failed to fetch user details.");

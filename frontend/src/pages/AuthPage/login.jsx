@@ -5,7 +5,6 @@ import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { motion } from "framer-motion";
-
 import "react-toastify/dist/ReactToastify.css";
 import { baseUrl } from "../../api";
 import { getUserDetails } from "../../utils/auth";
@@ -29,27 +28,30 @@ const LoginScreen = () => {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(`${baseUrl}/api/auth/login`, formData);
+      const loginResponse = await axios.post(`${baseUrl}/api/auth/login`, formData);
+      const token = loginResponse?.data?.token;
 
-
-      const { user } = await getUserDetails(data.token);
-
-      if (user.portal !== "andgate") {
-        toast.error("Login Failed!, please check the credential and try again.");
-        return
+      if (!token) {
+        throw new Error("No token received from login response.");
       }
 
-      localStorage.setItem("token", data.token);
-      dispatch(setUser({ ...user, token: data.token }));
+      const { user } = await getUserDetails(token);
+
+      localStorage.setItem("token", token);
+      dispatch(setUser({ ...user, token }));
+
       toast.success("Login successful!");
+
       setTimeout(() => window.location.reload(), 1500);
 
-    } catch (err) {
-      toast.error(err?.response?.data?.message || "Login failed.");
+    } catch (error) {
+      const message = error?.response?.data?.message || error.message || "Login failed.";
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex font-inter bg-neutral-900 text-white">

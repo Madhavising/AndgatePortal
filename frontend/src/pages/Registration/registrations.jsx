@@ -61,8 +61,6 @@ const CandidateRegistration = () => {
 
         const uploadedPath = response.data?.file?.filePath;
 
-        console.log('Upload success:', uploadedPath);
-
         setFormData((prev) => ({
           ...prev,
           resume: uploadedPath,
@@ -78,36 +76,6 @@ const CandidateRegistration = () => {
       ...prev,
       [name]: value,
     }));
-  };
-
-  const validateFresherForm = () => {
-    const {
-      email,
-      name,
-      mobile,
-      degree,
-      domain,
-      preferredLocation,
-      availability,
-      resume,
-      skills,
-    } = formData;
-
-    if (
-      !email ||
-      !name ||
-      !mobile ||
-      !degree ||
-      !domain ||
-      !preferredLocation ||
-      !availability ||
-      !resume ||
-      !skills
-    ) {
-      toast.error("Please fill all required fresher fields.");
-      return false;
-    }
-    return true;
   };
 
   const validateExperienceForm = () => {
@@ -154,23 +122,51 @@ const CandidateRegistration = () => {
     setStep(1);
   };
 
-  const submit = () => {
-    const fresherValid = validateFresherForm();
-    const experiencedValid = isExperienced ? validateExperienceForm() : true;
-    
-    if (!fresherValid || !experiencedValid) return;
-    
-    console.log("Submitted Data:", formData);
-    toast.success("Registration submitted successfully!");
+  const fresherCandidateSubmit = async () => {
+    const cleanedData = Object.fromEntries(
+      Object.entries(formData).filter(entry =>
+        entry[1] !== null && entry[1] !== undefined && entry[1] !== ''
+      )
+    );
 
+    try {
+      const response = await axios.post(`${baseUrl}/api/fresher_registration`, cleanedData);
+
+      if (response.status === 200) {
+        setSubmitted(true);
+      }
+    } catch (error) {
+      console.error("Fresher Candidate Submit Error:", error?.response?.data || error.message);
+      toast.error("Failed to register fresher candidate.");
+    }
+  };
+
+
+  const experienceCandidateSubmit = async () => {
+    if (!isExperienced || !validateExperienceForm()) return;
+
+    try {
+      const response = await axios.post(`${baseUrl}/api/experienced_registration`, formData);
+
+      if (response.status === 200) {
+        handleSuccessfulSubmission();
+      }
+    } catch (error) {
+      console.error("Experienced Candidate Submit Error:", error?.response?.data || error.message);
+      toast.error("Failed to register experienced candidate.");
+    }
+  };
+
+  const handleSuccessfulSubmission = () => {
     setFormData(initialFormState);
     setIsExperienced(false);
     setStep(0);
     setExperienceStep(0);
     setSubmitted(true);
-
+    toast.success("Registration submitted successfully!");
     setTimeout(() => setSubmitted(false), 3000);
   };
+
 
   const renderStyledStepper = () => {
     return (
@@ -455,12 +451,7 @@ const CandidateRegistration = () => {
                       </button>
                     ) : (
                       <button
-                        onClick={() => {
-                          if (validateFresherForm()) {
-                            setStep(1);
-                            setSubmitted(true);
-                          }
-                        }}
+                        onClick={fresherCandidateSubmit}
                         className="bg-green-600 text-white px-6  py-2 rounded-lg"
                       >
                         Submit
@@ -721,7 +712,7 @@ const CandidateRegistration = () => {
                 </button>
               ) : (
                 <button
-                  onClick={submit}
+                  onClick={experienceCandidateSubmit}
                   className="bg-green-600 text-white px-6 py-2 rounded-lg"
                 >
                   Submit

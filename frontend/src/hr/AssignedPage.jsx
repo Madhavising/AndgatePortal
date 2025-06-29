@@ -1,16 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { baseUrl } from "../api";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const AssignedCandidatePage = () => {
+  const token = localStorage.getItem("token")
   const navigate = useNavigate();
   const [assignedList, setAssignedList] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("assignedCandidates");
-    if (stored) {
-      setAssignedList(JSON.parse(stored));
-    }
+    const getAllCandidates = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/api/get_all_assigned`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json"
+            }
+          }
+        );
+
+        if (response.status === 200) {
+          setAssignedList(response.data.data);
+        }
+
+      } catch (error) {
+        console.error("Fresher Candidate Submit Error:", error?.response?.data || error.message);
+        toast.error("Failed to register fresher candidate.");
+      }
+    };
+    getAllCandidates()
   }, []);
 
   if (assignedList.length === 0) {
@@ -29,19 +50,19 @@ const AssignedCandidatePage = () => {
   }
 
   const renderStatusBadge = (status) => {
-  let color = "bg-gray-100 text-gray-700";
-  if (status === "Resume Shortlisted") color = "bg-yellow-100 text-yellow-800";
-  else if (status === "Interview Cleared") color = "bg-green-100 text-green-800";
-  else if (status === "HR Round Cleared") color = "bg-blue-100 text-blue-800";
-  else if (status === "Selected for Offer") color = "bg-indigo-100 text-indigo-800";
-  else if (status === "Rejected") color = "bg-red-100 text-red-800";
+    let color = "bg-gray-100 text-gray-700";
+    if (status === "Resume Shortlisted") color = "bg-yellow-100 text-yellow-800";
+    else if (status === "Interview Cleared") color = "bg-green-100 text-green-800";
+    else if (status === "HR Round Cleared") color = "bg-blue-100 text-blue-800";
+    else if (status === "Selected for Offer") color = "bg-indigo-100 text-indigo-800";
+    else if (status === "Rejected") color = "bg-red-100 text-red-800";
 
-  return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
-      {status}
-    </span>
-  );
-};
+    return (
+      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${color}`}>
+        {status}
+      </span>
+    );
+  };
 
 
   return (
@@ -70,12 +91,11 @@ const AssignedCandidatePage = () => {
                 <th className="px-6 py-3">Domain</th>
                 <th className="px-6 py-3">Status</th>
                 <th className="px-6 py-3">Resume</th>
-                <th className="px-6 py-3">Download</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {assignedList.map((candidate) => (
-                <tr key={candidate.id} className="hover:bg-gray-50">
+                <tr key={candidate._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-gray-800 font-medium">
                     {candidate.name}
                   </td>
@@ -86,37 +106,30 @@ const AssignedCandidatePage = () => {
                   <td className="px-6 py-4 text-gray-700">
                     {candidate.domain}
                   </td>
-                 <td className="px-6 py-4">
-  {renderStatusBadge(candidate.status || "Resume Shortlisted")}
-</td>
+                  <td className="px-6 py-4">
+                    {renderStatusBadge(candidate.status || "Resume Shortlisted")}
+                  </td>
+                  <td className="px-6 py-4">
+                    {candidate.resume && (() => {
+                      const resumeUrl = `${baseUrl}/${candidate.resume}`;
+                      const isDoc = candidate.resume.endsWith(".doc") || candidate.resume.endsWith(".docx");
+                      const viewUrl = isDoc
+                        ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(resumeUrl)}`
+                        : resumeUrl;
 
-                  <td className="px-6 py-4">
-                    {candidate.resume ? (
-                      <a
-                        href={`/resumes/${candidate.resume}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline"
-                      >
-                        {candidate.resume}
-                      </a>
-                    ) : (
-                      "—"
-                    )}
+                      return (
+                        <a
+                          href={viewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-sm font-medium transition"
+                        >
+                          View Resume
+                        </a>
+                      );
+                    })()}
                   </td>
-                  <td className="px-6 py-4">
-                    {candidate.resume ? (
-                      <a
-                        href={`/resumes/${candidate.resume}`}
-                        download
-                        className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-sm font-medium"
-                      >
-                        Download
-                      </a>
-                    ) : (
-                      "—"
-                    )}
-                  </td>
+
                 </tr>
               ))}
             </tbody>

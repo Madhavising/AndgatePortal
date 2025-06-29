@@ -1,0 +1,38 @@
+const mongoose = require("mongoose");
+
+const candidateSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    mobile: { type: String, required: true },
+    degree: { type: String },
+    domain: { type: String },
+    graduationYear: { type: String },
+    skills: { type: String },
+    selfRating: { type: String },
+    releventExp: { type: String },
+    expIncludingTraining: { type: String },
+    experienceYears: { type: String },
+    currentCTC: { type: String },
+    expectedCTC: { type: String },
+    jobChangeReason: { type: String },
+    interviewsAttended: { type: String },
+    companiesAppliedSixMonths: { type: String },
+    offerDetails: { type: String },
+    individualRole: { type: String },
+    foreignWork: { type: String },
+    preferredLocation: { type: String },
+    availability: { type: String },
+    bondWilling: { type: String },
+    bondDetails: { type: String },
+    poc: { type: String },
+    resume: { type: String },
+    isExperienced: { type: Boolean, default: false },
+    isAssigned: { type: Boolean, default: false },
+    assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    status: { type: String, enum: ["pending", "assigned"], default: "pending", required: true }
+}, {
+    versionKey: false,
+    timestamps: true
+});
+
+module.exports = mongoose.model("candidate", candidateSchema);
