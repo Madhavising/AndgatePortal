@@ -86,6 +86,7 @@ exports.fresherRegistration = async (req, res) => {
         name,
         poc,
         preferredLocation,
+        currentLocation,
         resume,
         skills
     } = req.body;
@@ -100,6 +101,7 @@ exports.fresherRegistration = async (req, res) => {
         resume,
         availability,
         preferredLocation,
+        currentLocation,
         skills
     };
 
@@ -130,6 +132,7 @@ exports.fresherRegistration = async (req, res) => {
             name,
             poc,
             preferredLocation,
+            currentLocation,
             resume,
             skills,
         });
@@ -174,6 +177,7 @@ exports.experiencedRegistration = async (req, res) => {
         offerDetails,
         poc,
         preferredLocation,
+        currentLocation,
         releventExp,
         resume,
         selfRating,
@@ -202,6 +206,7 @@ exports.experiencedRegistration = async (req, res) => {
         name,
         offerDetails,
         preferredLocation,
+        currentLocation,
         releventExp,
         resume,
         selfRating,
@@ -247,6 +252,7 @@ exports.experiencedRegistration = async (req, res) => {
             offerDetails,
             poc,
             preferredLocation,
+            currentLocation,
             releventExp,
             resume,
             selfRating,

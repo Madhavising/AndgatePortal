@@ -21,6 +21,7 @@ const candidateSchema = new mongoose.Schema({
     individualRole: { type: String },
     foreignWork: { type: String },
     preferredLocation: { type: String },
+    currentLocation: { type: String },
     availability: { type: String },
     bondWilling: { type: String },
     bondDetails: { type: String },
