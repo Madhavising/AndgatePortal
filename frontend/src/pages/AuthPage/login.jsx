@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
 import { baseUrl } from "../../api";
 import { getUserDetails } from "../../utils/auth";
@@ -17,6 +17,8 @@ const LoginScreen = () => {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const controls = useAnimation();
+  // const orbRef = useRef(null);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -59,33 +61,27 @@ const LoginScreen = () => {
       <div className="relative hidden md:flex w-1/2 flex-col justify-center items-start px-14 bg-[#0f0f19] overflow-hidden font-sans">
         {/* Animated Gradient Glow Orbs */}
         <motion.div
-          className="absolute -top-24 -left-24 w-[28rem] h-[28rem] rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600 opacity-30 blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 360, 0],
-            x: [0, 40, 0],
-            y: [0, -20, 0],
-          }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          // ref={orbRef}
+          className="absolute w-[500px] h-[500px] top-[-150px] left-[-150px] rounded-full bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 opacity-20 blur-3xl"
+          animate={controls}
         />
 
-        {/* Main Text */}
+        {/* Main Welcome Text */}
         <motion.div
           className="z-10"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
         >
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-5 leading-tight tracking-tight">
-            Welcome to &nbsp;
-            <span className="text-blue-500">ANDGATE Portal</span>
+          <h1 className="text-4xl font-extrabold text-white mb-4 leading-tight">
+            Welcome to <span className="text-blue-500">AndGate Portal</span>
           </h1>
-          <p className="text-lg text-neutral-300 max-w-sm">
-            Your all-in-one solution for HR, Candidate Management, and Talent
-            Acquisition.
+          <p className="text-sm text-neutral-300 max-w-lg">
+            Your all-in-one system for HR, Candidate Management & Smart
+            Onboarding.
           </p>
-          <p className="mt-5 text-sm text-neutral-500">
-            Reliable • Scalable • Efficient
+          <p className="mt-5 text-sm text-neutral-500 tracking-wide">
+            Reliable • Secure • Efficient
           </p>
         </motion.div>
       </div>
@@ -111,6 +107,7 @@ const LoginScreen = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
+                autoComplete="off"
                 required
                 placeholder=""
                 className="w-full px-4 py-2.5 rounded-md bg-[#1e1e2f] text-white border border-neutral-600 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm focus:shadow-md"

@@ -4,7 +4,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { baseUrl } from "../../api";
 
-
 const experienceSteps = ["Experience Info", "Tech & Offers"];
 
 const CandidateRegistration = () => {
@@ -21,6 +20,7 @@ const CandidateRegistration = () => {
     graduationYear: "",
     degree: "",
     domain: "",
+    currentLocation: "",
     preferredLocation: "",
     availability: "",
     resume: "",
@@ -47,17 +47,21 @@ const CandidateRegistration = () => {
   const handleChange = async (e) => {
     const { name, value, files } = e.target;
 
-    if (name === 'resume' && files?.length > 0) {
+    if (name === "resume" && files?.length > 0) {
       const file = files[0];
       const formDataToSend = new FormData();
-      formDataToSend.append('file', file);
+      formDataToSend.append("file", file);
 
       try {
-        const response = await axios.post(`${baseUrl}/api/upload_resume`, formDataToSend, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
+        const response = await axios.post(
+          `${baseUrl}/api/upload_resume`,
+          formDataToSend,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
 
         const uploadedPath = response.data?.file?.filePath;
 
@@ -66,7 +70,7 @@ const CandidateRegistration = () => {
           resume: uploadedPath,
         }));
       } catch (error) {
-        console.error('Upload error:', error.response?.data || error.message);
+        console.error("Upload error:", error.response?.data || error.message);
       }
 
       return;
@@ -124,35 +128,47 @@ const CandidateRegistration = () => {
 
   const fresherCandidateSubmit = async () => {
     const cleanedData = Object.fromEntries(
-      Object.entries(formData).filter(entry =>
-        entry[1] !== null && entry[1] !== undefined && entry[1] !== ''
+      Object.entries(formData).filter(
+        (entry) =>
+          entry[1] !== null && entry[1] !== undefined && entry[1] !== ""
       )
     );
 
     try {
-      const response = await axios.post(`${baseUrl}/api/fresher_registration`, cleanedData);
+      const response = await axios.post(
+        `${baseUrl}/api/fresher_registration`,
+        cleanedData
+      );
 
       if (response.status === 200) {
         setSubmitted(true);
       }
     } catch (error) {
-      console.error("Fresher Candidate Submit Error:", error?.response?.data || error.message);
+      console.error(
+        "Fresher Candidate Submit Error:",
+        error?.response?.data || error.message
+      );
       toast.error("Failed to register fresher candidate.");
     }
   };
-
 
   const experienceCandidateSubmit = async () => {
     if (!isExperienced || !validateExperienceForm()) return;
 
     try {
-      const response = await axios.post(`${baseUrl}/api/experienced_registration`, formData);
+      const response = await axios.post(
+        `${baseUrl}/api/experienced_registration`,
+        formData
+      );
 
       if (response.status === 200) {
         handleSuccessfulSubmission();
       }
     } catch (error) {
-      console.error("Experienced Candidate Submit Error:", error?.response?.data || error.message);
+      console.error(
+        "Experienced Candidate Submit Error:",
+        error?.response?.data || error.message
+      );
       toast.error("Failed to register experienced candidate.");
     }
   };
@@ -167,7 +183,6 @@ const CandidateRegistration = () => {
     setTimeout(() => setSubmitted(false), 3000);
   };
 
-
   const renderStyledStepper = () => {
     return (
       <div className="w-full flex items-center justify-between relative mb-6 px-2">
@@ -177,10 +192,11 @@ const CandidateRegistration = () => {
             className="flex flex-col items-center flex-1 relative z-10"
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${experienceStep >= index
-                ? "bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-600"
-                }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                experienceStep >= index
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-600"
+              }`}
             >
               {index + 1}
             </div>
@@ -193,16 +209,18 @@ const CandidateRegistration = () => {
         {experienceSteps.map((_, index) => {
           if (index === experienceSteps.length - 1) return null;
 
-          const leftPos = `calc(${(index / (experienceSteps.length - 1)) * 100
-            }% + 16px)`;
-          const segmentWidth = `calc(${100 / (experienceSteps.length - 1)
-            }% - 32px)`;
+          const leftPos = `calc(${
+            (index / (experienceSteps.length - 1)) * 100
+          }% + 16px)`;
+          const segmentWidth = `calc(${
+            100 / (experienceSteps.length - 1)
+          }% - 32px)`;
 
-          let background = "#d1d5db"; // gray by default
+          let background = "#d1d5db";
           if (experienceStep > index) {
-            background = "#2563eb"; // fully blue if past this segment
+            background = "#2563eb";
           } else if (experienceStep === index) {
-            background = "linear-gradient(to right, #2563eb 50%, #d1d5db 50%)"; // half-filled
+            background = "linear-gradient(to right, #2563eb 50%, #d1d5db 50%)";
           }
 
           return (
@@ -212,7 +230,7 @@ const CandidateRegistration = () => {
               style={{
                 left: leftPos,
                 width: segmentWidth,
-                background, // ✅ use "background" instead of "backgroundColor"
+                background,
               }}
             />
           );
@@ -272,14 +290,24 @@ const CandidateRegistration = () => {
                     />
                   </div>
                   <div className="flex flex-col">
-                    <label>POC in ANDGATE (TA's name)</label>
-                    <input
-                      type="text"
+                    <label>
+                      POC in ANDGATE (TA's name){" "}
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <select
                       name="poc"
                       value={formData.poc}
                       onChange={handleChange}
                       className="border px-3 py-2 rounded"
-                    />
+                      required
+                    >
+                      <option value="">Select</option>
+                      <option value="Richa">Richa Sharma</option>
+                      <option value="Saundarya">Saundarya</option>
+                      <option value="Reema">Reema</option>
+                      <option value="Preeti">Preeti</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                   <div className="flex flex-col">
                     <label>
@@ -382,6 +410,19 @@ const CandidateRegistration = () => {
                       type="text"
                       name="skills"
                       value={formData.skills}
+                      onChange={handleChange}
+                      className="border px-3 py-2 rounded"
+                      required
+                    />
+                  </div>
+                   <div className="flex flex-col">
+                    <label>
+                      Current Location <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="preferredLocation"
+                      value={formData.currentLocation}
                       onChange={handleChange}
                       className="border px-3 py-2 rounded"
                       required

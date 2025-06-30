@@ -16,30 +16,29 @@ const CandidateList = () => {
   useEffect(() => {
     const getAllCandidates = async () => {
       try {
-        const response = await axios.get(`${baseUrl}/api/get_all_candidates`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json"
-            }
-          }
-        );
+        const response = await axios.get(`${baseUrl}/api/get_all_candidates`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
         if (response.status === 200) {
-          setCandidates(response.data.data)
+          setCandidates(response.data.data);
         }
-
       } catch (error) {
-        console.error("Fresher Candidate Submit Error:", error?.response?.data || error.message);
+        console.error(
+          "Fresher Candidate Submit Error:",
+          error?.response?.data || error.message
+        );
         toast.error("Failed to register fresher candidate.");
       }
     };
 
-    getAllCandidates()
+    getAllCandidates();
   }, [token, refreshKey]);
 
   const handleAssign = async (candidateId) => {
-
     try {
       const response = await axios.patch(
         `${baseUrl}/api/assigned_to_me/${candidateId}`,
@@ -47,18 +46,20 @@ const CandidateList = () => {
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
       if (response.status === 200) {
         toast.success(`Assigned successfully`);
-        setRefreshKey(prev => prev + 1);
+        setRefreshKey((prev) => prev + 1);
       }
-
     } catch (error) {
-      console.error("Candidate update Error:", error?.response?.data || error.message);
+      console.error(
+        "Candidate update Error:",
+        error?.response?.data || error.message
+      );
       toast.error("Failed to update candidate.");
     }
   };
@@ -120,7 +121,7 @@ const CandidateList = () => {
                     </div>
                   </td>
                 </tr>
-              )
+              );
             })}
           </tbody>
         </table>
@@ -130,7 +131,6 @@ const CandidateList = () => {
       {selectedCandidate && (
         <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center px-4">
           <div className="bg-white max-w-4xl w-full rounded-2xl p-6 shadow-2xl overflow-y-auto max-h-[90vh] relative border border-gray-200">
-
             {/* Close Button */}
             <button
               onClick={() => setSelectedCandidate(null)}
@@ -142,27 +142,41 @@ const CandidateList = () => {
 
             {/* Header */}
             <div className="mb-6">
-              <h2 className="text-3xl font-bold text-gray-800 mb-1">Candidate Details</h2>
-              <p className="text-sm text-gray-500">Review the candidate's information and make a decision.</p>
+              <h2 className="text-3xl font-bold text-gray-800 mb-1">
+                Candidate Details
+              </h2>
+              <p className="text-sm text-gray-500">
+                Review the candidate's information and make a decision.
+              </p>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end gap-3 mb-4">
-              {/* <button
+            <div className="flex justify-end gap-2 mb-3">
+              <button
+                onClick={() => {
+                  toast.error("Candidate on hold");
+                  setSelectedCandidate(null);
+                }}
+                className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-sm"
+              >
+                On Hold
+              </button>
+              <button
                 onClick={() => {
                   toast.success("Candidate Accepted");
                   setSelectedCandidate(null);
                 }}
-                className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow"
+                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded text-sm"
               >
                 Accept
-              </button> */}
+              </button>
+
               <button
                 onClick={() => {
                   toast.error("Candidate Rejected");
                   setSelectedCandidate(null);
                 }}
-                className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-medium shadow"
+                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm"
               >
                 Reject
               </button>
@@ -174,36 +188,50 @@ const CandidateList = () => {
               <Info label="Email" value={selectedCandidate.email} />
               <Info label="Mobile" value={selectedCandidate.mobile} />
               <Info label="POC in ANDGATE" value={selectedCandidate.poc} />
-              <Info label="Graduation Year" value={selectedCandidate.graduationYear} />
+              <Info
+                label="Graduation Year"
+                value={selectedCandidate.graduationYear}
+              />
               <Info label="Degree" value={selectedCandidate.degree} />
               <Info label="Domain" value={selectedCandidate.domain} />
-              <Info label="Availability" value={selectedCandidate.availability} />
-              <Info label="Preferred Locations" value={selectedCandidate.preferredLocation} />
+              <Info
+                label="Availability"
+                value={selectedCandidate.availability}
+              />
+              <Info
+                label="Preferred Locations"
+                value={selectedCandidate.preferredLocation}
+              />
 
               {/* Resume */}
-              {selectedCandidate.resume && (() => {
-                const resumeUrl = `${baseUrl}/${selectedCandidate.resume}`;
-                const isDoc = selectedCandidate.resume.endsWith(".doc") || selectedCandidate.resume.endsWith(".docx");
-                const viewUrl = isDoc
-                  ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(resumeUrl)}`
-                  : resumeUrl;
+              {selectedCandidate.resume &&
+                (() => {
+                  const resumeUrl = `${baseUrl}/${selectedCandidate.resume}`;
+                  const isDoc =
+                    selectedCandidate.resume.endsWith(".doc") ||
+                    selectedCandidate.resume.endsWith(".docx");
+                  const viewUrl = isDoc
+                    ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
+                        resumeUrl
+                      )}`
+                    : resumeUrl;
 
-                return (
-                  <Info
-                    label="Resume"
-                    value={
-                      <a
-                        href={viewUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 underline hover:text-blue-800 transition"
-                      >
-                        📄 View Resume
-                      </a>
-                    }
-                  />
-                );
-              })()}
+                  return (
+                    <Info
+                      label="Resume"
+                      value={
+                        <a
+                          href={viewUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 underline hover:text-blue-800 transition"
+                        >
+                          📄 View Resume
+                        </a>
+                      }
+                    />
+                  );
+                })()}
             </div>
 
             {/* Experience Section */}
@@ -213,27 +241,65 @@ const CandidateList = () => {
                   Experience Details
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 text-sm">
-                  <Info label="Experience Years" value={selectedCandidate.experienceYears} />
-                  <Info label="Self Rating" value={selectedCandidate.selfRating} />
-                  <Info label="Individual Role" value={selectedCandidate.individualRole} />
-                  <Info label="Bond Details" value={selectedCandidate.bondDetails} />
-                  <Info label="Bond Willingness" value={selectedCandidate.bondWilling} />
-                  <Info label="Experience Excluding Training" value={selectedCandidate.expExcludingTraining} />
-                  <Info label="Experience Including Training" value={selectedCandidate.expIncludingTraining} />
-                  <Info label="Job Change Reason" value={selectedCandidate.jobChangeReason} />
-                  <Info label="Interviews Attended" value={selectedCandidate.interviewsAttended} />
-                  <Info label="Foreign Work Experience" value={selectedCandidate.foreignWork} />
+                  <Info
+                    label="Experience Years"
+                    value={selectedCandidate.experienceYears}
+                  />
+                  <Info
+                    label="Self Rating"
+                    value={selectedCandidate.selfRating}
+                  />
+                  <Info
+                    label="Individual Role"
+                    value={selectedCandidate.individualRole}
+                  />
+                  <Info
+                    label="Bond Details"
+                    value={selectedCandidate.bondDetails}
+                  />
+                  <Info
+                    label="Bond Willingness"
+                    value={selectedCandidate.bondWilling}
+                  />
+                  <Info
+                    label="Relevant Experience"
+                    value={selectedCandidate.releventExp}
+                  />
+                  <Info
+                    label="Experience Including Training"
+                    value={selectedCandidate.expIncludingTraining}
+                  />
+                  <Info
+                    label="Job Change Reason"
+                    value={selectedCandidate.jobChangeReason}
+                  />
+                  <Info
+                    label="Interviews Attended"
+                    value={selectedCandidate.interviewsAttended}
+                  />
+                  <Info
+                    label="Foreign Work Experience"
+                    value={selectedCandidate.foreignWork}
+                  />
                   <Info label="Skills" value={selectedCandidate.skills} />
-                  <Info label="CTC Details" value={selectedCandidate.currentCTC} />
-                  <Info label="Expected CTC" value={selectedCandidate.expectedCTC} />
-                  <Info label="Offers in Hand" value={selectedCandidate.offerDetails} />
+                  <Info
+                    label="CTC Details"
+                    value={selectedCandidate.currentCTC}
+                  />
+                  <Info
+                    label="Expected CTC"
+                    value={selectedCandidate.expectedCTC}
+                  />
+                  <Info
+                    label="Offers in Hand"
+                    value={selectedCandidate.offerDetails}
+                  />
                 </div>
               </div>
             )}
           </div>
         </div>
       )}
-
     </div>
   );
 };
