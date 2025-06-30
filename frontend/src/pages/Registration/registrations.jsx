@@ -421,7 +421,7 @@ const CandidateRegistration = () => {
                     </label>
                     <input
                       type="text"
-                      name="preferredLocation"
+                      name="currentLocation"
                       value={formData.currentLocation}
                       onChange={handleChange}
                       className="border px-3 py-2 rounded"
