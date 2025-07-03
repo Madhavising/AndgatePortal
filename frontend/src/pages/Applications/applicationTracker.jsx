@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { format } from "date-fns";
+import moment from "moment";
 import { FaPlus, FaCheck, FaTimes, FaEdit } from "react-icons/fa";
 
 const ApplicationTracker = () => {
@@ -10,7 +10,8 @@ const ApplicationTracker = () => {
   const [feedbackText, setFeedbackText] = useState("");
   const [feedbacks, setFeedbacks] = useState({ AndGate: "", Client: [] });
 
-  const getTimestamp = () => format(new Date(), "dd MMM yyyy, hh:mm a");
+  const getTimestamp = () => moment().format("DD MMM YYYY, hh:mm A");
+
 
   const addClientRound = () => {
     setClientRounds([...clientRounds, { decision: "", timestamp: "" }]);

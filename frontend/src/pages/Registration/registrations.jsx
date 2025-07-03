@@ -303,9 +303,12 @@ const CandidateRegistration = () => {
                     >
                       <option value="">Select</option>
                       <option value="Richa">Richa Sharma</option>
-                      <option value="Saundarya">Saundarya</option>
-                      <option value="Reema">Reema</option>
-                      <option value="Preeti">Preeti</option>
+                      <option value="Saundarya">Saundarya Vishnoi</option>
+                      <option value="Reema">Reema Soni</option>
+                      <option value="Reema">Shamna OV</option>
+                      <option value="Reema">Shubhi Purwar</option>
+                      <option value="Reema">Shrashti Gupta</option>
+                      <option value="Preeti">Preeti Chauhan</option>
                       <option value="Other">Other</option>
                     </select>
                   </div>
@@ -415,7 +418,7 @@ const CandidateRegistration = () => {
                       required
                     />
                   </div>
-                   <div className="flex flex-col">
+                  <div className="flex flex-col">
                     <label>
                       Current Location <span className="text-red-500">*</span>
                     </label>
