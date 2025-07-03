@@ -11,12 +11,14 @@ import {
   ChevronRight,
   BriefcaseIcon,
   UserCircleIcon,
+  UsersRoundIcon,
 } from "lucide-react";
 
 const navItems = [
-  { to: "/dashboard", label: "Dashboard", icon: Home },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/teams", label: "Teams", icon: UsersRoundIcon },
   { to: "/candidates", label: "Candidates", icon: BriefcaseIcon },
-  { to: "/assigned", label: "Assigned", icon: Users },
+  { to: "/assigned-candidates", label: "Assigned Candidates", icon: Users },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/settings", label: "Settings", icon: Settings },
 ];

@@ -4,9 +4,9 @@ import { useSelector } from "react-redux";
 
 // Layouts & Pages
 import Layout from "../layout/Layout";
-import LoginScreen from "../pages/authPage/Login";
+
 import Dashboard from "../pages/dashboard/Dashboard";
-import CandidateRegistration from "../pages/registration/Registrations";
+
 import HrLayout from "../layout/hrLayout";
 
 import CandidateList from "../hr/CandidateList";
@@ -16,6 +16,11 @@ import HrSettings from "../hr/HrSetting";
 import HrDashboard from "../hr/HrDashboard";
 import AssignedCandidatePage from "../hr/AssignedPage";
 import Unauthorized from "../pages/unauthorized";
+import LoginScreen from "../pages/AuthPage/login";
+import CandidateRegistration from "../pages/Registration/registrations";
+import ApplicationTracker from "../pages/Applications/applicationTracker";
+import TeamsPage from "../hr/Teams";
+
 
 // import UserDashboard from '../pages/UserPage/userDashboard';
 // import SuperAdminPanel from '../pages/SuperAdmin/panel';
@@ -52,11 +57,19 @@ const AppRouter = ({ isAuth }) => {
           <Route element={<HrLayout />}>
             <Route path="/dashboard" element={<HrDashboard />} />
             {/* Add more admin routes here */}
+            <Route path="/teams" element={<TeamsPage />} />
             <Route path="/candidates" element={<CandidateList />} />
-            <Route path="/assigned" element={<AssignedCandidatePage />} />
+            <Route
+              path="/assigned-candidates"
+              element={<AssignedCandidatePage />}
+            />
 
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/settings" element={<HrSettings />} />
+            <Route
+              path="/application-tracker"
+              element={<ApplicationTracker />}
+            />
           </Route>
         </Route>
 
