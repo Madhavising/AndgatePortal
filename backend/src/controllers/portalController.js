@@ -137,6 +137,11 @@ exports.fresherRegistration = async (req, res) => {
             skills,
         });
 
+        if (poc) {
+            candidate.assignedTo = poc;
+            candidate.isAssigned = true
+        }
+
         await candidate.save();
 
         return res.status(200).json({
@@ -260,6 +265,11 @@ exports.experiencedRegistration = async (req, res) => {
             isExperienced: true
         });
 
+        if (poc) {
+            candidate.assignedTo = poc;
+            candidate.isAssigned = true
+        }
+
         await candidate.save();
 
         return res.status(200).json({
@@ -287,7 +297,6 @@ exports.assignedToMe = async (req, res) => {
                 _id: candidateId,
             },
             {
-                status: "assigned",
                 assignedTo: user._id,
                 isAssigned: true,
             },

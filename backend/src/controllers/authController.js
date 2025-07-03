@@ -81,4 +81,41 @@ const getUserDetailsById = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserDetailsById };
+const getAllHrs = async (req, res) => {
+  try {
+    const getAllHr = await User.find(
+      {
+        role: "hr",
+      },
+      {
+        _id: 1,
+        firstName: 1,
+        lastName :1,
+      }
+    );
+
+    if (!getAllHr) {
+      return res.status(404).json({
+        status: false,
+        message: "User not found.",
+      });
+    }
+
+    return res.status(200).json({
+      status: true,
+      data: getAllHr,
+    });
+
+  } catch (error) {
+    console.error("Error fetching Hr list:", error);
+
+    return res.status(500).json({
+      status: false,
+      message: "Error fetching Hr list.",
+      error: error.message,
+    });
+  }
+}
+
+
+module.exports = { registerUser, loginUser, getUserDetailsById, getAllHrs };

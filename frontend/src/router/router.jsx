@@ -32,7 +32,7 @@ const PrivateRoute = ({ isAuth }) =>
 const PublicRoute = ({ isAuth }) =>
   !isAuth ? <Outlet /> : <Navigate to="/Dashboard" replace />;
 const AdminRoute = ({ user }) =>
-  user?.role === "admin" ? <Outlet /> : <Navigate to="/unauthorized" replace />;
+  user?.role === "admin" || user?.role === "hr" ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 // const SuperAdminRoute = ({ user }) => user?.role === 'superadmin' ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 // const UserRoute = ({ user }) => user?.role === 'User' ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 

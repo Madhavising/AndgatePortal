@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { baseUrl } from "../../api";
+import { useEffect } from "react";
 
 const experienceSteps = ["Experience Info", "Tech & Offers"];
 
@@ -11,6 +12,7 @@ const CandidateRegistration = () => {
   const [step, setStep] = useState(0);
   const [experienceStep, setExperienceStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [hrList, setHrList] = useState([]);
 
   const initialFormState = {
     email: "",
@@ -133,7 +135,6 @@ const CandidateRegistration = () => {
           entry[1] !== null && entry[1] !== undefined && entry[1] !== ""
       )
     );
-
     try {
       const response = await axios.post(
         `${baseUrl}/api/fresher_registration`,
@@ -183,6 +184,22 @@ const CandidateRegistration = () => {
     setTimeout(() => setSubmitted(false), 3000);
   };
 
+  useEffect(() => {
+    const getAllHrs = async () => {
+      try {
+        let response = await axios.get(`${baseUrl}/api/auth/get_all_hr`);
+
+        console.log(response)
+        if (response.status === 200) {
+          setHrList(response.data.data)
+        }
+      } catch (error) {
+        console.log("Error fetching Hr list:", error.message)
+      }
+    }
+    getAllHrs();
+  }, [])
+
   const renderStyledStepper = () => {
     return (
       <div className="w-full flex items-center justify-between relative mb-6 px-2">
@@ -192,11 +209,10 @@ const CandidateRegistration = () => {
             className="flex flex-col items-center flex-1 relative z-10"
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
-                experienceStep >= index
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-300 text-gray-600"
-              }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${experienceStep >= index
+                ? "bg-blue-600 text-white"
+                : "bg-gray-300 text-gray-600"
+                }`}
             >
               {index + 1}
             </div>
@@ -209,12 +225,10 @@ const CandidateRegistration = () => {
         {experienceSteps.map((_, index) => {
           if (index === experienceSteps.length - 1) return null;
 
-          const leftPos = `calc(${
-            (index / (experienceSteps.length - 1)) * 100
-          }% + 16px)`;
-          const segmentWidth = `calc(${
-            100 / (experienceSteps.length - 1)
-          }% - 32px)`;
+          const leftPos = `calc(${(index / (experienceSteps.length - 1)) * 100
+            }% + 16px)`;
+          const segmentWidth = `calc(${100 / (experienceSteps.length - 1)
+            }% - 32px)`;
 
           let background = "#d1d5db";
           if (experienceStep > index) {
@@ -302,14 +316,14 @@ const CandidateRegistration = () => {
                       required
                     >
                       <option value="">Select</option>
-                      <option value="Richa">Richa Sharma</option>
-                      <option value="Saundarya">Saundarya Vishnoi</option>
-                      <option value="Reema">Reema Soni</option>
-                      <option value="Reema">Shamna OV</option>
-                      <option value="Reema">Shubhi Purwar</option>
-                      <option value="Reema">Shrashti Gupta</option>
-                      <option value="Preeti">Preeti Chauhan</option>
-                      <option value="Other">Other</option>
+                      {
+                        hrList && hrList.map((e) => {
+                          return (
+                            <option key={e._id} value={e._id}>{e.firstName + " " + e.lastName}</option>
+                          )
+                        })
+                      }
+
                     </select>
                   </div>
                   <div className="flex flex-col">
