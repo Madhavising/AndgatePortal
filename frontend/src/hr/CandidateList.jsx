@@ -120,6 +120,7 @@ const CandidateList = () => {
         onClose={() => setSelectedCandidate(null)}
         handleStatusUpdate={handleStatusUpdate}
       />
+      
     </div>
   );
 };

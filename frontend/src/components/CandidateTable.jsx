@@ -60,7 +60,7 @@ const CandidateTable = ({
       <span
         className={`${base} ${color} cursor-pointer`}
         onClick={() => {
-          if (status === "assigned") navigate("/application-tracker");
+          if (status === "assigned" || status === "Accepted") navigate("/application-tracker");
         }}
       >
         {status || "Pending"}

@@ -1,98 +1,198 @@
-import React, { useState } from "react";
-import moment from "moment";
-import { FaPlus, FaCheck, FaTimes, FaEdit } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaPlus, FaCheck, FaTimes, FaLock } from "react-icons/fa";
 
 const ApplicationTracker = () => {
-  const [clientRounds, setClientRounds] = useState([]);
+  const [technicalRounds, setTechnicalRounds] = useState([
+    { name: "", feedback: "", status: "" },
+  ]);
+  const [clientRounds, setClientRounds] = useState([
+    { name: "", feedback: "", status: "" },
+  ]);
+  const [screening, setScreening] = useState({
+    name: "",
+    feedback: "",
+    status: "",
+  });
+  const [orientation, setOrientation] = useState({
+    name: "",
+    feedback: "",
+    status: "",
+  });
   const [status, setStatus] = useState("Pending");
-  const [isLocked, setIsLocked] = useState(false);
-  const [modal, setModal] = useState({ open: false, round: null, index: null });
+
+  const [modal, setModal] = useState({ open: false, type: "", index: null });
   const [feedbackText, setFeedbackText] = useState("");
-  const [feedbacks, setFeedbacks] = useState({ AndGate: "", Client: [] });
 
-  const getTimestamp = () => moment().format("DD MMM YYYY, hh:mm A");
-
-
-  const addClientRound = () => {
-    setClientRounds([...clientRounds, { decision: "", timestamp: "" }]);
-    setFeedbacks((prev) => ({ ...prev, Client: [...prev.Client, ""] }));
+  const updateRound = (rounds, setRounds, index, key, value) => {
+    const updated = [...rounds];
+    updated[index][key] = value;
+    setRounds(updated);
   };
 
-  const handleDecision = (round, index, decision) => {
-    const timestamp = getTimestamp();
-    if (round === "AndGate") {
-      setStatus(decision === "qualified" ? "Qualified" : "Disqualified");
-      if (decision === "disqualified") setIsLocked(true);
-    } else {
-      const updated = [...clientRounds];
-      updated[index].decision = decision;
-      updated[index].timestamp = timestamp;
-      setClientRounds(updated);
-    }
+  const addRound = (setter) =>
+    setter((prev) => [...prev, { name: "", feedback: "", status: "" }]);
+
+  const saveFeedback = () => {
+    if (modal.type === "screening")
+      setScreening({ ...screening, feedback: feedbackText });
+    else if (modal.type === "technical")
+      updateRound(
+        technicalRounds,
+        setTechnicalRounds,
+        modal.index,
+        "feedback",
+        feedbackText
+      );
+    else if (modal.type === "orientation")
+      setOrientation({ ...orientation, feedback: feedbackText });
+    else if (modal.type === "client")
+      updateRound(
+        clientRounds,
+        setClientRounds,
+        modal.index,
+        "feedback",
+        feedbackText
+      );
+
+    setModal({ open: false, type: "", index: null });
+    setFeedbackText("");
   };
 
-  const openFeedbackModal = (round, index) => {
-    setModal({ open: true, round, index });
-    setFeedbackText(
-      round === "AndGate" ? feedbacks.AndGate : feedbacks.Client[index] || ""
+  const renderStatusBadge = (status) => {
+    const styles = {
+      Qualified: "bg-green-100 text-green-700",
+      Disqualified: "bg-red-100 text-red-700",
+      Upcoming: "bg-yellow-100 text-yellow-700",
+    };
+    return status ? (
+      <span
+        className={`px-3 py-1 text-xs font-semibold rounded-full ${
+          styles[status] || "bg-gray-100 text-gray-600"
+        }`}
+      >
+        {status}
+      </span>
+    ) : null;
+  };
+
+  const renderRoundCard = (round, index, type, updater) => {
+    const isObjectRound = type === "screening" || type === "orientation";
+
+    const handleInputChange = (field, value) => {
+      if (isObjectRound) {
+        type === "screening" && setScreening({ ...screening, [field]: value });
+        type === "orientation" &&
+          setOrientation({ ...orientation, [field]: value });
+      } else {
+        updateRound(
+          updater,
+          type === "client" ? setClientRounds : setTechnicalRounds,
+          index,
+          field,
+          value
+        );
+      }
+    };
+
+    return (
+      <div
+        key={index}
+        className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm transition hover:shadow-md"
+      >
+        <h3 className="text-sm font-bold text-gray-800 mb-3 capitalize">
+          {type} Round{" "}
+          {type !== "screening" && type !== "orientation" ? index + 1 : ""}
+        </h3>
+        <input
+          type="text"
+          value={round.name}
+          onChange={(e) => handleInputChange("name", e.target.value)}
+          placeholder="Interviewer Name"
+          className="w-full text-sm px-3 py-2 border border-gray-300 rounded mb-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+        <button
+          onClick={() => {
+            setModal({ open: true, type, index });
+            setFeedbackText(round.feedback || "");
+          }}
+          className="text-blue-600 text-sm underline hover:text-blue-800 mb-2"
+        >
+          {round.feedback ? "Edit" : "Add"} Feedback
+        </button>
+
+        {round.feedback && (
+          <div className="bg-gray-50 p-3 rounded border text-sm mb-3 text-gray-700">
+            <strong>Feedback:</strong>
+            <p className="mt-1 whitespace-pre-line">{round.feedback}</p>
+          </div>
+        )}
+
+        <div className="flex justify-between items-center mt-3 flex-wrap gap-2">
+          <div className="flex gap-2">
+            <button
+              title="Mark Qualified"
+              onClick={() => handleInputChange("status", "Qualified")}
+              className="p-2 rounded bg-green-600 hover:bg-green-700 text-white"
+            >
+              <FaCheck />
+            </button>
+            <button
+              title="Mark Disqualified"
+              onClick={() => handleInputChange("status", "Disqualified")}
+              className="p-2 rounded bg-red-600 hover:bg-red-700 text-white"
+            >
+              <FaTimes />
+            </button>
+          </div>
+          {renderStatusBadge(round.status)}
+        </div>
+      </div>
     );
   };
 
-  const saveFeedback = () => {
-    if (modal.round === "AndGate") {
-      setFeedbacks((prev) => ({ ...prev, AndGate: feedbackText }));
-    } else {
-      const updated = [...feedbacks.Client];
-      updated[modal.index] = feedbackText;
-      setFeedbacks((prev) => ({ ...prev, Client: updated }));
-    }
-    setModal({ open: false, round: null, index: null });
-  };
+  const allTechnicalQualified = technicalRounds.every(
+    (r) => r.status === "Qualified"
+  );
 
-  const getStatusBadge = (decision) => {
-    if (!decision) return <span className="text-gray-400">Pending</span>;
-    if (decision === "qualified")
-      return (
-        <span className="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-semibold">
-          Qualified
-        </span>
-      );
-    if (decision === "disqualified")
-      return (
-        <span className="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">
-          Disqualified
-        </span>
-      );
-    return null;
-  };
+  useEffect(() => {
+    const allRounds = [
+      screening.status,
+      ...technicalRounds.map((r) => r.status),
+      allTechnicalQualified ? orientation.status : "",
+      ...clientRounds.map((r) => r.status),
+    ];
+
+    if (allRounds.includes("Disqualified")) setStatus("Disqualified");
+    else if (allRounds.every((s) => s === "Qualified" && s))
+      setStatus("Qualified");
+    else setStatus("Pending");
+  }, [screening, technicalRounds, orientation, clientRounds]);
 
   return (
-    <div className="max-w-7xl mx-auto p-6 font-sans bg-gray-50 h-full">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-3 sm:gap-0">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-          Application Tracker
+    <div className="max-w-7xl mx-auto py-10 px-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <h1 className="text-2xl font-bold text-gray-900">
+          🎯 Application Tracker
         </h1>
         <span
-          className={`inline-block px-4 py-2 rounded-full text-xs sm:text-sm font-semibold whitespace-nowrap
-      ${
-        status === "Pending"
-          ? "bg-yellow-100 text-yellow-800"
-          : status === "Qualified"
-          ? "bg-green-100 text-green-800"
-          : "bg-red-100 text-red-800"
-      }`}
+          className={`px-4 py-2 rounded-full text-sm font-medium ${
+            status === "Qualified"
+              ? "bg-green-100 text-green-700"
+              : status === "Disqualified"
+              ? "bg-red-100 text-red-700"
+              : "bg-yellow-100 text-yellow-700"
+          }`}
         >
           Status: {status}
         </span>
       </div>
 
-      {/* Candidate Card */}
-      <section className="bg-white rounded-lg shadow-md p-6 mb-10">
-        <h2 className="text-xl font-semibold mb-4 text-gray-800">
-          Candidate Overview
+      {/* Candidate Info */}
+      <div className="bg-white p-6 rounded-lg shadow mb-10">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">
+          👤 Candidate Info
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 text-gray-700 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
           <div>
             <strong>Name:</strong> John Doe
           </div>
@@ -112,319 +212,75 @@ const ApplicationTracker = () => {
             <strong>Skills:</strong> Node.js, MongoDB
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Interview Stages Table */}
-      <section className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
-        <div className="flex justify-between items-center mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
-            Interview Stages
+      {/* Internal Rounds */}
+      <div className="mb-10">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold text-blue-700 mb-5">
+            🏢 Internal Rounds (Andgate)
           </h2>
-          <button
-            disabled={isLocked}
-            onClick={addClientRound}
-            className={`inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md text-white text-xs sm:text-sm font-medium transition 
-        ${
-          isLocked
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-        }`}
-          >
-            <FaPlus /> Add Client Round
-          </button>
-        </div>
-
-        {/* TABLE for medium and up */}
-        <div className="overflow-x-auto hidden sm:block">
-          <table className="w-full min-w-[600px] border-collapse border border-gray-200 text-sm sm:text-base">
-            <thead className="bg-gray-100">
-              <tr>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-left text-gray-600 font-medium">
-                  Round
-                </th>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-left text-gray-600 font-medium">
-                  Interviewer
-                </th>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-left text-gray-600 font-medium">
-                  Feedback
-                </th>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-left text-gray-600 font-medium">
-                  Decision
-                </th>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-left text-gray-600 font-medium">
-                  Timestamp
-                </th>
-                <th className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* AndGate Row */}
-              <tr className="hover:bg-gray-50 transition">
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 font-semibold text-gray-900">
-                  AndGate Interview
-                </td>
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 font-normal text-gray-900">
-                  Tech Team
-                </td>
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200">
-                  <button
-                    onClick={() => openFeedbackModal("AndGate")}
-                    className="w-full text-left text-blue-600 hover:underline focus:outline-none"
-                    title="Click to add/edit feedback"
-                  >
-                    {feedbacks.AndGate || (
-                      <span className="text-gray-400 italic">Add feedback</span>
-                    )}
-                  </button>
-                </td>
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 flex gap-2 sm:gap-3 items-center">
-                  <button
-                    disabled={isLocked}
-                    onClick={() => handleDecision("AndGate", null, "qualified")}
-                    className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md flex items-center gap-1 text-xs sm:text-sm"
-                    title="Qualify Candidate"
-                  >
-                    <FaCheck />
-                  </button>
-                  <button
-                    disabled={isLocked}
-                    onClick={() =>
-                      handleDecision("AndGate", null, "disqualified")
-                    }
-                    className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md flex items-center gap-1 text-xs sm:text-sm"
-                    title="Disqualify Candidate"
-                  >
-                    <FaTimes />
-                  </button>
-                  {getStatusBadge(status.toLowerCase())}
-                </td>
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-gray-600 whitespace-nowrap">
-                  {status !== "Pending" ? getTimestamp() : "--"}
-                </td>
-                <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-center">
-                  <button
-                    onClick={() => openFeedbackModal("AndGate")}
-                    className="text-gray-500 hover:text-gray-700"
-                    title="Edit Feedback"
-                  >
-                    <FaEdit />
-                  </button>
-                </td>
-              </tr>
-
-              {/* Client Rounds */}
-              {clientRounds.map((round, index) => (
-                <tr key={index} className="hover:bg-gray-50 transition">
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 font-semibold text-gray-900">
-                    Client {index + 1}
-                  </td>
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 font-normal text-gray-900">
-                    Client Name
-                  </td>
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200">
-                    <button
-                      onClick={() => openFeedbackModal("Client", index)}
-                      className="w-full text-left text-blue-600 hover:underline focus:outline-none"
-                      title="Click to add/edit feedback"
-                    >
-                      {feedbacks.Client[index] || (
-                        <span className="text-gray-400 italic">
-                          Add feedback
-                        </span>
-                      )}
-                    </button>
-                  </td>
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 flex gap-2 sm:gap-3 items-center">
-                    <button
-                      disabled={isLocked}
-                      onClick={() =>
-                        handleDecision("Client", index, "qualified")
-                      }
-                      className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md flex items-center gap-1 text-xs sm:text-sm"
-                      title="Qualify Candidate"
-                    >
-                      <FaCheck />
-                    </button>
-                    <button
-                      disabled={isLocked}
-                      onClick={() =>
-                        handleDecision("Client", index, "disqualified")
-                      }
-                      className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-2 py-1 sm:px-3 sm:py-1 rounded-md flex items-center gap-1 text-xs sm:text-sm"
-                      title="Disqualify Candidate"
-                    >
-                      <FaTimes />
-                    </button>
-                    {getStatusBadge(round.decision)}
-                  </td>
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-gray-600 whitespace-nowrap">
-                    {round.timestamp || "--"}
-                  </td>
-                  <td className="py-2 px-3 sm:py-3 sm:px-6 border border-gray-200 text-center">
-                    <button
-                      onClick={() => openFeedbackModal("Client", index)}
-                      className="text-gray-500 hover:text-gray-700"
-                      title="Edit Feedback"
-                    >
-                      <FaEdit />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* CARD LIST for small devices */}
-        <div className="sm:hidden space-y-4">
-          {/* AndGate Card */}
-          <div className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-gray-900 font-semibold">AndGate Interview</h3>
-              <button
-                onClick={() => openFeedbackModal("AndGate")}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                title="Edit Feedback"
-                aria-label="Edit AndGate feedback"
-              >
-                <FaEdit size={18} />
-              </button>
-            </div>
-
-            <p className="text-sm text-gray-700 mb-2">
-              <span className="font-medium">Interviewer:</span> Tech Team
-            </p>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {renderRoundCard(screening, 0, "screening", null)}
+            {technicalRounds.map((round, idx) =>
+              renderRoundCard(round, idx, "technical", technicalRounds)
+            )}
             <button
-              onClick={() => openFeedbackModal("AndGate")}
-              className="inline-flex items-center gap-1 text-blue-600 font-semibold text-sm hover:underline focus:outline-none px-1 py-0.5 rounded mb-4"
-              title="Click to add/edit feedback"
-              aria-label="Add or edit AndGate feedback"
+              onClick={() => addRound(setTechnicalRounds)}
+              className="w-full sm:w-auto border-2 border-dashed border-blue-500 text-blue-600 hover:bg-blue-50 p-4 rounded-lg flex items-center justify-center text-sm"
             >
-              {feedbacks.AndGate || (
-                <span className="italic text-gray-400">Add feedback</span>
-              )}
-              <FaEdit className="text-blue-600" size={14} />
+              <FaPlus className="mr-2" /> Add Technical Round
             </button>
-
-            <div className="flex flex-wrap gap-2 mb-2">
-              <button
-                disabled={isLocked}
-                onClick={() => handleDecision("AndGate", null, "qualified")}
-                className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-1 rounded-md flex items-center gap-1 text-xs"
-                title="Qualify Candidate"
-              >
-                <FaCheck /> Qualify
-              </button>
-              <button
-                disabled={isLocked}
-                onClick={() => handleDecision("AndGate", null, "disqualified")}
-                className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-1 rounded-md flex items-center gap-1 text-xs"
-                title="Disqualify Candidate"
-              >
-                <FaTimes /> Disqualify
-              </button>
-              {getStatusBadge(status.toLowerCase())}
-            </div>
-
-            <p className="text-gray-600 text-xs">
-              <span className="font-medium">Timestamp:</span>{" "}
-              {status !== "Pending" ? getTimestamp() : "--"}
-            </p>
+            {allTechnicalQualified &&
+              renderRoundCard(orientation, 0, "orientation", null)}
           </div>
-
-          {/* Client Rounds Cards */}
-          {clientRounds.map((round, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition"
-            >
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="text-gray-900 font-semibold">
-                  Client {index + 1}
-                </h3>
-                <button
-                  onClick={() => openFeedbackModal("Client", index)}
-                  className="text-gray-500 hover:text-gray-700 focus:outline-none"
-                  title="Edit Feedback"
-                  aria-label={`Edit Client ${index + 1} feedback`}
-                >
-                  <FaEdit size={18} />
-                </button>
-              </div>
-
-              <p className="text-sm text-gray-700 mb-2">
-                <span className="font-medium">Interviewer:</span>{" "}
-                <button
-                  onClick={() => openFeedbackModal("Client", index)}
-                  className="inline-flex items-center gap-1 text-blue-600 font-semibold text-sm hover:underline focus:outline-none px-1 py-0.5 rounded"
-                  title="Click to add/edit feedback"
-                  aria-label={`Add or edit Client ${index + 1} feedback`}
-                >
-                  {feedbacks.Client[index] || (
-                    <span className="italic text-gray-400">Add feedback</span>
-                  )}
-                  <FaEdit className="text-blue-600" size={14} />
-                </button>
-              </p>
-
-              <div className="flex flex-wrap gap-2 mb-2">
-                <button
-                  disabled={isLocked}
-                  onClick={() => handleDecision("Client", index, "qualified")}
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-1 rounded-md flex items-center gap-1 text-xs"
-                  title="Qualify Candidate"
-                >
-                  <FaCheck /> Qualify
-                </button>
-                <button
-                  disabled={isLocked}
-                  onClick={() =>
-                    handleDecision("Client", index, "disqualified")
-                  }
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-3 py-1 rounded-md flex items-center gap-1 text-xs"
-                  title="Disqualify Candidate"
-                >
-                  <FaTimes /> Disqualify
-                </button>
-                {getStatusBadge(round.decision)}
-              </div>
-
-              <p className="text-gray-600 text-xs">
-                <span className="font-medium">Timestamp:</span>{" "}
-                {round.timestamp || "--"}
-              </p>
-            </div>
-          ))}
         </div>
-      </section>
+      </div>
+
+      {/* Client Rounds */}
+      <div className="mb-16">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 gap-3">
+            <h2 className="text-lg font-semibold text-yellow-600 flex items-center gap-2">
+              <FaLock /> Client Rounds
+            </h2>
+            <button
+              onClick={() => addRound(setClientRounds)}
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm flex items-center justify-center gap-2"
+            >
+              <FaPlus /> Add Client Round
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {clientRounds.map((round, idx) =>
+              renderRoundCard(round, idx, "client", clientRounds)
+            )}
+          </div>
+        </div>
+      </div>
 
       {/* Feedback Modal */}
       {modal.open && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 px-4 py-6">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md max-h-[90vh] overflow-auto">
-            <h3 className="text-xl font-semibold mb-4 text-gray-900">
-              Enter Feedback
-            </h3>
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center px-4">
+          <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
+            <h3 className="text-lg font-semibold mb-4">Enter Feedback</h3>
             <textarea
-              rows={5}
+              rows={4}
+              className="w-full p-2 border border-gray-300 rounded resize-none mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={feedbackText}
               onChange={(e) => setFeedbackText(e.target.value)}
-              className="w-full p-3 mb-4 border border-gray-300 rounded resize-y min-h-[120px] focus:outline-none focus:ring-2 focus:ring-blue-600"
-              placeholder="Write feedback here..."
+              placeholder="Write feedback..."
             />
-            <div className="flex justify-end gap-3 flex-wrap">
+            <div className="flex justify-end gap-3">
               <button
-                onClick={() =>
-                  setModal({ open: false, round: null, index: null })
-                }
-                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100"
+                onClick={() => setModal({ open: false, type: "", index: null })}
               >
                 Cancel
               </button>
               <button
+                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
                 onClick={saveFeedback}
-                className="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
               >
                 Save
               </button>

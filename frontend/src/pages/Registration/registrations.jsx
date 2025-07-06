@@ -189,16 +189,16 @@ const CandidateRegistration = () => {
       try {
         let response = await axios.get(`${baseUrl}/api/auth/get_all_hr`);
 
-        console.log(response)
+        console.log(response);
         if (response.status === 200) {
-          setHrList(response.data.data)
+          setHrList(response.data.data);
         }
       } catch (error) {
-        console.log("Error fetching Hr list:", error.message)
+        console.log("Error fetching Hr list:", error.message);
       }
-    }
+    };
     getAllHrs();
-  }, [])
+  }, []);
 
   const renderStyledStepper = () => {
     return (
@@ -209,10 +209,11 @@ const CandidateRegistration = () => {
             className="flex flex-col items-center flex-1 relative z-10"
           >
             <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${experienceStep >= index
-                ? "bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-600"
-                }`}
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold text-sm ${
+                experienceStep >= index
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-300 text-gray-600"
+              }`}
             >
               {index + 1}
             </div>
@@ -225,10 +226,12 @@ const CandidateRegistration = () => {
         {experienceSteps.map((_, index) => {
           if (index === experienceSteps.length - 1) return null;
 
-          const leftPos = `calc(${(index / (experienceSteps.length - 1)) * 100
-            }% + 16px)`;
-          const segmentWidth = `calc(${100 / (experienceSteps.length - 1)
-            }% - 32px)`;
+          const leftPos = `calc(${
+            (index / (experienceSteps.length - 1)) * 100
+          }% + 16px)`;
+          const segmentWidth = `calc(${
+            100 / (experienceSteps.length - 1)
+          }% - 32px)`;
 
           let background = "#d1d5db";
           if (experienceStep > index) {
@@ -316,14 +319,14 @@ const CandidateRegistration = () => {
                       required
                     >
                       <option value="">Select</option>
-                      {
-                        hrList && hrList.map((e) => {
+                      {hrList &&
+                        hrList.map((e) => {
                           return (
-                            <option key={e._id} value={e._id}>{e.firstName + " " + e.lastName}</option>
-                          )
-                        })
-                      }
-
+                            <option key={e._id} value={e._id}>
+                              {e.firstName + " " + e.lastName}
+                            </option>
+                          );
+                        })}
                     </select>
                   </div>
                   <div className="flex flex-col">
