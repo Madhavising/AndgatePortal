@@ -14,6 +14,8 @@ const CandidateList = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
 
   // const [assignedCandidate, setAssignedCandidate] = useState(null);
   // const navigate = useNavigate();
@@ -69,13 +71,28 @@ const CandidateList = () => {
     }
   };
 
-  const handleStatusUpdate = (status) => {
-    const updatedList = candidates.map((c) =>
-      c._id === selectedCandidate._id ? { ...c, status } : c
-    );
+  const handleStatusUpdate = async (status) => {
+    try {
+      const response = await axios.patch(`${baseUrl}/api/change_candidate_status/${selectedCandidate._id}`, { status: status }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      })
+      if (response.status === 200) {
+       toast.success(`Great! Status is now set to ${capitalizeFirst(status)}.`);
+        setRefreshKey((prev) => prev + 1);
+        setSelectedCandidate(null)
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error(
+        "Candidate update Error:",
+        error?.response?.data || error.message
+      );
+    }
 
-    setCandidates(updatedList); // update the UI list
-    toast.success(`Status updated to ${status}`);
   };
 
   return (
@@ -120,7 +137,7 @@ const CandidateList = () => {
         onClose={() => setSelectedCandidate(null)}
         handleStatusUpdate={handleStatusUpdate}
       />
-      
+
     </div>
   );
 };

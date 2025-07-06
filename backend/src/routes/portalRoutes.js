@@ -9,6 +9,7 @@ router.post('/fresher_registration', portalController.fresherRegistration);
 router.post('/experienced_registration', portalController.experiencedRegistration);
 router.get('/get_all_candidates', authMiddleware, portalController.getAllUnassignedCanditates);
 router.patch('/assigned_to_me/:candidateId', authMiddleware, portalController.assignedToMe)
-router.get('/get_all_assigned', authMiddleware, portalController.getAllAssignedCanditates)
+router.get('/get_all_assigned', authMiddleware, portalController.getAllAssignedCanditates);
+router.patch('/change_candidate_status/:candidateId', authMiddleware, portalController.statusChange)
 
 module.exports = router;

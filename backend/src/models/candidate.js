@@ -30,7 +30,7 @@ const candidateSchema = new mongoose.Schema({
     isExperienced: { type: Boolean, default: false },
     isAssigned: { type: Boolean, default: false },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    status: { type: String, enum: ["pending", "assigned"], default: "pending", required: true }
+    status: { type: String, enum: ["pending", "assigned", "onhold", "approved", "employee", "tranee", "deployed", "rejected"], default: "pending", required: true }
 }, {
     versionKey: false,
     timestamps: true

@@ -329,3 +329,30 @@ exports.assignedToMe = async (req, res) => {
     }
 };
 
+exports.statusChange = async (req, res) => {
+    const candidateId = req.params.candidateId;
+    const status = req.body.status;
+    try {
+        const candidate = await CandidateModel.findOneAndUpdate({ _id: candidateId },
+            { status: status }, { new: true }
+        );
+        if (!candidate) {
+            return res.status(404).json({
+                status: false,
+                message: "Candidate not found or not assigned to you.",
+            });
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Candidate status updated successfully.",
+            candidate,
+        });
+    } catch (error) {
+        console.error("Error updating candidate status:", error);
+        return res.status(500).json({
+            status: false,
+            message: "Failed to update candidate status.",
+            error: error.message,
+        });
+    }
+}

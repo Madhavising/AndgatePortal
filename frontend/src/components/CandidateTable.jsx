@@ -11,10 +11,10 @@ const CandidateTable = ({
   showEditButton = false,
   isAssignedTable = false,
 }) => {
-    const [isMobileView, setIsMobileView] = useState(false);
+  const [isMobileView, setIsMobileView] = useState(false);
   const navigate = useNavigate();
 
-    useEffect(() => {
+  useEffect(() => {
     const checkWidth = () => {
       setIsMobileView(window.innerWidth <= 1265);
     };
@@ -38,23 +38,23 @@ const CandidateTable = ({
       // case "HR Round Cleared":
       //   color = "bg-blue-100 text-blue-800";
       //   break;
-      case "Accepted":
-        color = "bg-indigo-100 text-indigo-800";
-        break;
+      // case "Accepted":
+      //   color = "bg-indigo-100 text-indigo-800";
+      //   break;
       case "Rejected":
         color = "bg-red-100 text-red-800";
         break;
-      case "On Hold":
+      case "Onhold":
         color = "bg-orange-100 text-orange-800";
         break;
-      case "assigned":
+      case "Assigned":
         color = "bg-green-200 text-green-900";
         break;
       default:
         break;
     }
 
-  
+
 
     return (
       <span
@@ -68,7 +68,7 @@ const CandidateTable = ({
     );
   };
 
-   return (
+  return (
     <>
       {/* Desktop Table View */}
       {!isMobileView && (
@@ -99,7 +99,11 @@ const CandidateTable = ({
                   <td className="px-6 py-4 text-gray-700">{candidate.mobile}</td>
                   <td className="px-6 py-4 text-gray-700">{candidate.domain}</td>
                   <td className="px-6 py-4 text-gray-700">{candidate.experienceYears || "Fresher"}</td>
-                  <td className="px-6 py-4">{renderStatusBadge(candidate.status)}</td>
+                  <td className="px-6 py-4">
+                    {renderStatusBadge(
+                      candidate.status.charAt(0).toUpperCase() + candidate.status.slice(1)
+                    )}
+                  </td>
                   {isAssignedTable && (
                     <td className="px-6 py-4">
                       <div className="truncate max-w-[120px] text-gray-700" title={candidate.remarks}>
