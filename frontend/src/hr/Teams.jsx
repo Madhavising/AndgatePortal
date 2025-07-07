@@ -1,87 +1,96 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   MagnifyingGlassIcon,
   EyeIcon,
   XMarkIcon,
   PencilSquareIcon,
 } from "@heroicons/react/24/outline";
-
-const hrData = [
-  {
-    hrName: "Richa ",
-    hrEmail: "richa@andgate.com",
-    candidates: [
-      {
-        name: "Amit Kumar",
-        status: "Shortlisted",
-        email: "amit@example.com",
-        updated: "1 day ago",
-        phone: "+91 9876543210",
-        skills: ["React", "Node.js"],
-        resume: "https://example.com/resume-amit.pdf",
-        notes: "Strong in backend. Good communication.",
-      },
-    ],
-  },
-  {
-    hrName: "Saundarya",
-    hrEmail: "saundarya@andgate.com",
-    candidates: [
-      {
-        name: "Rohan Das",
-        status: "Rejected",
-        email: "rohan@example.com",
-        updated: "3 days ago",
-        phone: "+91 9123456789",
-        skills: ["HTML", "CSS"],
-        resume: "https://example.com/resume-rohan.pdf",
-        notes: "Lacked experience in JavaScript.",
-      },
-    ],
-  },
-];
+import { baseUrl } from "../api";
+import axios from "axios";
+import { toast } from "react-toastify";
+import MiniLoading from "../components/miniLoading";
+import moment from "moment"
 
 const statusColors = {
-  Shortlisted: "bg-yellow-100 text-yellow-800",
-  Interviewed: "bg-blue-100 text-blue-800",
-  Selected: "bg-green-100 text-green-800",
-  Rejected: "bg-red-100 text-red-800",
-  Pending: "bg-gray-100 text-gray-800",
+  onhold: "bg-yellow-100 text-yellow-800",
+  approved: "bg-blue-100 text-blue-800",
+  assigned: "bg-green-100 text-green-800",
+  rejected: "bg-red-100 text-red-800",
+  pending: "bg-gray-100 text-gray-800",
 };
 
 const TeamsPage = () => {
+  const token = localStorage.getItem('token')
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCandidate, setSelectedCandidate] = useState(null);
+  const [loading, setLoading] = useState(true)
+  const [hrData, setHrData] = useState([])
 
-  const filteredData = hrData.flatMap((hr) =>
-    hr.candidates
-      .filter((c) =>
-        `${c.name} ${hr.hrName}`
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      )
-      .map((c) => ({ ...c, hrName: hr.hrName, hrEmail: hr.hrEmail }))
-  );
+  const filteredData = hrData.filter((c) => {
+    const fullName = `${c.user.firstName} ${c.user.lastName}`.toLowerCase();
+    const userEmail = c.user.email.toLowerCase();
+    const candidateEmail = c.email.toLowerCase();
+    const name = c.name.toLowerCase();
+    const status = c.status.toLowerCase();
+
+    const term = searchTerm.toLowerCase();
+
+    return (
+      fullName.includes(term) ||
+      userEmail.includes(term) ||
+      candidateEmail.includes(term) ||
+      name.includes(term) ||
+      status.includes(term)
+    );
+  });
+
+
+  useEffect(() => {
+    const getAllCandidates = async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/api/get_all_assigned`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.status === 200) {
+          // console.log("jdfls", response.data.data)
+          setHrData(response.data.data);
+        }
+      } catch (error) {
+        console.error("Candidate Fetch Error:", error?.response?.data || error.message);
+        toast.error("Failed to fetch assigned candidates.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getAllCandidates();
+  }, [token]);
+
+  if (loading) return <MiniLoading />;
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-       <div className="mb-6 border-b border-gray-200 pb-4">
+      <div className="mb-6 border-b border-gray-200 pb-4">
 
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between  gap-4">
-        <h2 className="text-3xl font-bold text-gray-800">Team Overview</h2>
-        <div className="relative w-full max-w-md">
-          <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
-          <input
-            type="text"
-            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparen"
-            placeholder="Search by HR or Candidate"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between  gap-4">
+          <h2 className="text-3xl font-bold text-gray-800">Team Overview</h2>
+          <div className="relative w-full max-w-md">
+            <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-2.5 text-gray-400" />
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparen"
+              placeholder="Search by HR or Candidate"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
         </div>
-        
       </div>
-       </div>
 
       <div className="overflow-x-auto">
         <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -115,24 +124,23 @@ const TeamsPage = () => {
               filteredData.map((c, i) => (
                 <tr key={i} className="border-t hover:bg-gray-50">
                   <td className="px-4 py-3 text-sm text-gray-700">
-                    {c.hrName}
+                    {c.user.firstName + " " + c.user.lastName}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {c.hrEmail}
+                    {c.user.email}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-700">{c.name}</td>
                   <td className="px-4 py-3 text-sm text-gray-500">{c.email}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${
-                        statusColors[c.status] || "bg-gray-100 text-gray-800"
-                      }`}
+                      className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[c.status] || "bg-gray-100 text-gray-800"
+                        }`}
                     >
                       {c.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-500">
-                    {c.updated}
+                    {moment(c.updatedAt).format("lll")}
                   </td>
                   <td className="px-4 py-3">
                     <button
@@ -180,15 +188,14 @@ const TeamsPage = () => {
               </div>
               <div>
                 <span className="font-semibold text-gray-700">Phone:</span>
-                <div>{selectedCandidate.phone || "N/A"}</div>
+                <div>{selectedCandidate.mobile || "N/A"}</div>
               </div>
               <div>
                 <span className="font-semibold text-gray-700">Status:</span>
                 <span
-                  className={`ml-1 text-xs font-medium px-3 py-1 rounded-full ${
-                    statusColors[selectedCandidate.status] ||
+                  className={`ml-1 text-xs font-medium px-3 py-1 rounded-full ${statusColors[selectedCandidate.status] ||
                     "bg-gray-100 text-gray-800"
-                  }`}
+                    }`}
                 >
                   {selectedCandidate.status}
                 </span>
@@ -196,41 +203,56 @@ const TeamsPage = () => {
               <div className="col-span-2">
                 <span className="font-semibold text-gray-700">Skills:</span>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedCandidate.skills?.map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                  {selectedCandidate.skills
+                    .split(",")
+                    .map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
+                      >
+                        {skill.trim()}
+                      </span>
+                    ))}
+
                 </div>
               </div>
               <div>
                 <span className="font-semibold text-gray-700">HR:</span>
-                <div>{selectedCandidate.hrName}</div>
+                <div>{selectedCandidate.user.firstName + " " + selectedCandidate.user.lastName}</div>
               </div>
               <div>
                 <span className="font-semibold text-gray-700">
                   Last Updated:
                 </span>
-                <div>{selectedCandidate.updated}</div>
+                <div>{moment(selectedCandidate.updatedAt).format("lll")}</div>
               </div>
               <div className="col-span-2">
                 <span className="font-semibold text-gray-700">Resume:</span>
-                <a
-                  href={selectedCandidate.resume}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  View Resume
-                </a>
+                {selectedCandidate.resume && (
+                  <div className="mt-1">
+                    <a
+                      href={
+                        selectedCandidate.resume.endsWith(".doc") ||
+                          selectedCandidate.resume.endsWith(".docx")
+                          ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
+                            `${baseUrl}/${selectedCandidate.resume}`
+                          )}`
+                          : `${baseUrl}/${selectedCandidate.resume}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 underline hover:text-blue-800 transition"
+                    >
+                      📄 View Resume
+                    </a>
+                  </div>
+                )}
               </div>
+
               <div className="col-span-2">
                 <span className="font-semibold text-gray-700">Notes:</span>
                 <p className="mt-1 text-gray-600 italic">
-                  {selectedCandidate.notes || "No notes provided."}
+                  {selectedCandidate.remark || "No notes provided."}
                 </p>
               </div>
             </div>

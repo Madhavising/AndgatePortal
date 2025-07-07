@@ -60,7 +60,7 @@ const CandidateTable = ({
       <span
         className={`${base} ${color} cursor-pointer`}
         onClick={() => {
-          if (status === "assigned" || status === "Accepted") navigate("/application-tracker");
+          if (status === "Assigned") navigate("/application-tracker");
         }}
       >
         {status || "Pending"}
@@ -106,8 +106,13 @@ const CandidateTable = ({
                   </td>
                   {isAssignedTable && (
                     <td className="px-6 py-4">
-                      <div className="truncate max-w-[120px] text-gray-700" title={candidate.remarks}>
-                        {candidate.remarks || "—"}
+                      <div
+                        className="truncate max-w-[120px] text-gray-700"
+                        title={candidate.remarks}
+                      >
+                        {(candidate.remark?.length > 40
+                          ? candidate.remark.slice(0, 40) + "..."
+                          : candidate.remark) || "—"}
                       </div>
                     </td>
                   )}

@@ -4,7 +4,7 @@ const CandidateModel = require("../models/candidate")
 
 exports.getAllUnassignedCanditates = async (req, res) => {
     try {
-        const registrationForms = await CandidateModel.find({ isAssigned: false }).lean().exec();
+        const registrationForms = await CandidateModel.find({ isAssigned: false, status: { $ne: "rejected" } }).lean().exec();
 
         return res.status(200).json({
             status: true,
@@ -21,10 +21,52 @@ exports.getAllUnassignedCanditates = async (req, res) => {
     }
 };
 
-exports.getAllAssignedCanditates = async (req, res) => {
+exports.getAssignedCanditatesToMe = async (req, res) => {
     const user = req.user;
     try {
-        const allAssigned = await CandidateModel.find({ assignedTo: user._id }).lean().exec();
+        const allAssigned = await CandidateModel.find({ assignedTo: user._id, status: { $ne: "rejected" } }).lean().exec();
+
+        return res.status(200).json({
+            status: true,
+            data: allAssigned,
+        });
+    } catch (error) {
+        console.error("Error fetching assigned candidates:", error);
+
+        return res.status(500).json({
+            status: false,
+            message: "Failed to fetch assigned candidates.",
+            error: error.message,
+        });
+    }
+};
+
+exports.getAllAssignedCanditates = async (req, res) => {
+    try {
+        const allAssigned = await CandidateModel.aggregate([
+            {
+                '$match': {
+                    'isAssigned': true,
+                    'status': { '$ne': "rejected" }
+                }
+            }, {
+                '$lookup': {
+                    'from': 'users',
+                    'localField': 'assignedTo',
+                    'foreignField': '_id',
+                    'as': 'user'
+                }
+            }, {
+                '$unwind': {
+                    'path': '$user',
+                    'preserveNullAndEmptyArrays': false
+                }
+            }, {
+                '$sort': {
+                    'createdAt': -1
+                }
+            }
+        ]);
 
         return res.status(200).json({
             status: true,
@@ -352,6 +394,34 @@ exports.statusChange = async (req, res) => {
         return res.status(500).json({
             status: false,
             message: "Failed to update candidate status.",
+            error: error.message,
+        });
+    }
+}
+
+exports.addRemark = async (req, res) => {
+    const candidateId = req.params.candidateId;
+    const remark = req.body.remark;
+    try {
+        const candidate = await CandidateModel.findOneAndUpdate({ _id: candidateId },
+            { remark: remark }, { new: true }
+        );
+        if (!candidate) {
+            return res.status(404).json({
+                status: false,
+                message: "Candidate not found or not assigned to you.",
+            });
+        }
+        return res.status(200).json({
+            status: true,
+            message: "Candidate remark updated successfully.",
+            candidate,
+        });
+    } catch (error) {
+        console.error("Error updating candidate remark:", error);
+        return res.status(500).json({
+            status: false,
+            message: "Failed to update candidate remark.",
             error: error.message,
         });
     }

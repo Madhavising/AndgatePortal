@@ -1,25 +1,25 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { FaEye, FaUserPlus } from "react-icons/fa";
-// import { useNavigate } from "react-router-dom";
-import { baseUrl } from "../api";
 import { toast } from "react-toastify";
 import { Search } from "lucide-react";
 
+import { baseUrl } from "../api";
 import CandidateInformation from "../components/CandidateInformation";
 import CandidateTable from "../components/CandidateTable";
 
 const CandidateList = () => {
   const token = localStorage.getItem("token");
-  const [refreshKey, setRefreshKey] = useState(0);
+
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
 
+  // Capitalize first letter utility
+  const capitalizeFirst = (str) =>
+    str.charAt(0).toUpperCase() + str.slice(1);
 
-  // const [assignedCandidate, setAssignedCandidate] = useState(null);
-  // const navigate = useNavigate();
-
+  // Fetch all candidates
   useEffect(() => {
     const getAllCandidates = async () => {
       try {
@@ -34,21 +34,19 @@ const CandidateList = () => {
           setCandidates(response.data.data);
         }
       } catch (error) {
-        console.error(
-          "Fresher Candidate Submit Error:",
-          error?.response?.data || error.message
-        );
-        toast.error("Failed to register fresher candidate.");
+        console.error("Fetch Candidates Error:", error?.response?.data || error.message);
+        toast.error("Failed to load candidates.");
       }
     };
 
     getAllCandidates();
   }, [token, refreshKey]);
 
+  // Assign candidate
   const handleAssign = async (candidateId) => {
     try {
       const response = await axios.patch(
-        `${baseUrl}/api/assigned_to_me/${candidateId}`,
+        `${baseUrl}/api/assign_candidate_to_me/${candidateId}`,
         {},
         {
           headers: {
@@ -59,41 +57,54 @@ const CandidateList = () => {
       );
 
       if (response.status === 200) {
-        toast.success(`Assigned successfully`);
+        toast.success("Candidate assigned successfully");
         setRefreshKey((prev) => prev + 1);
       }
     } catch (error) {
-      console.error(
-        "Candidate update Error:",
-        error?.response?.data || error.message
-      );
-      toast.error("Failed to update candidate.");
+      console.error("Assign Candidate Error:", error?.response?.data || error.message);
+      toast.error("Failed to assign candidate.");
     }
   };
 
+  // Update status of candidate
   const handleStatusUpdate = async (status) => {
     try {
-      const response = await axios.patch(`${baseUrl}/api/change_candidate_status/${selectedCandidate._id}`, { status: status }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      })
+      const response = await axios.patch(
+        `${baseUrl}/api/change_candidate_status/${selectedCandidate._id}`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
       if (response.status === 200) {
-       toast.success(`Great! Status is now set to ${capitalizeFirst(status)}.`);
+        toast.success(`Status updated to ${capitalizeFirst(status)}`);
         setRefreshKey((prev) => prev + 1);
-        setSelectedCandidate(null)
+        setSelectedCandidate(null);
       } else {
         toast.error("Failed to update status");
       }
     } catch (error) {
-      console.error(
-        "Candidate update Error:",
-        error?.response?.data || error.message
-      );
+      console.error("Status Update Error:", error?.response?.data || error.message);
+      toast.error("Status update failed");
     }
-
   };
+
+  // Filter candidates based on search term
+  const filteredCandidates = candidates.filter((c) => {
+    const term = searchTerm.toLowerCase();
+    return (
+      c.email.toLowerCase().includes(term) ||
+      c.name.toLowerCase().includes(term) ||
+      c.status.toLowerCase().includes(term) ||
+      c.mobile.toLowerCase().includes(term) ||
+      c.domain.toLowerCase().includes(term)
+      // c.experienceYears.includes(term)
+    );
+  });
 
   return (
     <div className="p-4 md:p-6 bg-[#f8fafc] h-full font-inter overflow-x-hidden">
@@ -101,12 +112,11 @@ const CandidateList = () => {
         {/* Header Section */}
         <div className="mb-6 border-b border-gray-200 pb-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            {/* Heading */}
             <h2 className="text-2xl font-bold text-gray-900">
               Candidate Submission Panel
             </h2>
 
-            {/* Search Bar */}
+            {/* Search Input */}
             <div className="relative w-full md:w-96">
               <span className="absolute left-3 top-2.5 text-gray-400">
                 <Search size={16} />
@@ -114,30 +124,32 @@ const CandidateList = () => {
               <input
                 type="text"
                 placeholder="Search..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
         </div>
 
-        {/* Table Section */}
+        {/* Candidate Table */}
         <div className="overflow-x-auto rounded-xl shadow border border-gray-200 bg-white">
           <CandidateTable
-            candidates={candidates}
+            candidates={filteredCandidates}
             onAssign={handleAssign}
             onView={setSelectedCandidate}
             showAssignButton={true}
+            searchTerm={searchTerm}
           />
         </div>
       </div>
 
-      {/* Review Modal */}
+      {/* Candidate Detail Modal */}
       <CandidateInformation
         selectedCandidate={selectedCandidate}
         onClose={() => setSelectedCandidate(null)}
         handleStatusUpdate={handleStatusUpdate}
       />
-
     </div>
   );
 };
