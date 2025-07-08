@@ -54,8 +54,6 @@ const CandidateTable = ({
         break;
     }
 
-
-
     return (
       <span
         className={`${base} ${color} cursor-pointer`}
@@ -82,7 +80,13 @@ const CandidateTable = ({
                 <th className="px-6 py-3">Domain</th>
                 <th className="px-6 py-3">Exp</th>
                 <th className="px-6 py-3">Status</th>
-                {isAssignedTable && <th className="px-6 py-3">Remarks</th>}
+                {isAssignedTable && (
+                  <>
+                    <th className="px-6 py-3">Remarks</th>
+                    <th className="px-6 py-3">Rating</th>
+                  </>
+                )}
+
                 <th className="px-6 py-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -96,15 +100,23 @@ const CandidateTable = ({
                     {candidate.name}
                   </td>
                   <td className="px-6 py-4 text-gray-700">{candidate.email}</td>
-                  <td className="px-6 py-4 text-gray-700">{candidate.mobile}</td>
-                  <td className="px-6 py-4 text-gray-700">{candidate.domain}</td>
-                  <td className="px-6 py-4 text-gray-700">{candidate.experienceYears || "Fresher"}</td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {candidate.mobile}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {candidate.domain}
+                  </td>
+                  <td className="px-6 py-4 text-gray-700">
+                    {candidate.experienceYears || "Fresher"}
+                  </td>
                   <td className="px-6 py-4">
                     {renderStatusBadge(
-                      candidate.status.charAt(0).toUpperCase() + candidate.status.slice(1)
+                      candidate.status.charAt(0).toUpperCase() +
+                        candidate.status.slice(1)
                     )}
                   </td>
                   {isAssignedTable && (
+                    <>
                     <td className="px-6 py-4">
                       <div
                         className="truncate max-w-[120px] text-gray-700"
@@ -114,19 +126,34 @@ const CandidateTable = ({
                           ? candidate.remark.slice(0, 40) + "..."
                           : candidate.remark) || "—"}
                       </div>
+                     
                     </td>
+                    <td> <div className="text-center">1</div></td>
+                    </>
                   )}
                   <td className="px-6 py-4 space-x-2 text-center">
-                    <button onClick={() => onView(candidate)} className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition" title="View">
+                    <button
+                      onClick={() => onView(candidate)}
+                      className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md transition"
+                      title="View"
+                    >
                       <FaEye />
                     </button>
                     {showAssignButton && (
-                      <button onClick={() => onAssign(candidate._id)} className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md transition" title="Assign">
+                      <button
+                        onClick={() => onAssign(candidate._id)}
+                        className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-md transition"
+                        title="Assign"
+                      >
                         <FaUserPlus />
                       </button>
                     )}
                     {showEditButton && (
-                      <button onClick={() => onEdit(candidate)} className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-md transition" title="Edit">
+                      <button
+                        onClick={() => onEdit(candidate)}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-md transition"
+                        title="Edit"
+                      >
                         <FaEdit />
                       </button>
                     )}
@@ -151,29 +178,50 @@ const CandidateTable = ({
                   <h3 className="text-lg font-semibold text-gray-800 capitalize">
                     {candidate.name}
                   </h3>
-                  <p className="text-sm text-gray-500">{candidate.domain || "—"}</p>
+                  <p className="text-sm text-gray-500">
+                    {candidate.domain || "—"}
+                  </p>
                 </div>
                 <div>{renderStatusBadge(candidate.status)}</div>
               </div>
               <div className="text-sm text-gray-700 space-y-1 mb-4">
-                <p><span className="font-medium">Email:</span> {candidate.email}</p>
-                <p><span className="font-medium">Phone:</span> {candidate.mobile}</p>
-                <p><span className="font-medium">Experience:</span> {candidate.experienceYears || "Fresher"}</p>
+                <p>
+                  <span className="font-medium">Email:</span> {candidate.email}
+                </p>
+                <p>
+                  <span className="font-medium">Phone:</span> {candidate.mobile}
+                </p>
+                <p>
+                  <span className="font-medium">Experience:</span>{" "}
+                  {candidate.experienceYears || "Fresher"}
+                </p>
                 {isAssignedTable && (
-                  <p><span className="font-medium">Remarks:</span> {candidate.remarks || "—"}</p>
+                  <p>
+                    <span className="font-medium">Remarks:</span>{" "}
+                    {candidate.remarks || "—"}
+                  </p>
                 )}
               </div>
               <div className="flex gap-2">
-                <button onClick={() => onView(candidate)} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-md text-sm">
+                <button
+                  onClick={() => onView(candidate)}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-md text-sm"
+                >
                   <FaEye className="inline mr-1" /> View
                 </button>
                 {showAssignButton && (
-                  <button onClick={() => onAssign(candidate._id)} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-md text-sm">
+                  <button
+                    onClick={() => onAssign(candidate._id)}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-md text-sm"
+                  >
                     <FaUserPlus className="inline mr-1" /> Assign
                   </button>
                 )}
                 {showEditButton && (
-                  <button onClick={() => onEdit(candidate)} className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1.5 px-3 rounded-md text-sm">
+                  <button
+                    onClick={() => onEdit(candidate)}
+                    className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white py-1.5 px-3 rounded-md text-sm"
+                  >
                     Edit
                   </button>
                 )}

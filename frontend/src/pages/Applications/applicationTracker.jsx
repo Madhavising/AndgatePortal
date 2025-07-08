@@ -298,7 +298,7 @@ import React, { useState } from "react";
 import Select from "react-select";
 import { FaLock, FaPlus } from "react-icons/fa6";
 
-const applicationTracker = () => {
+const ApplicationTracker = () => {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     eventName: "",
@@ -440,7 +440,7 @@ const applicationTracker = () => {
                 </label>
                 <Select
                   options={interviewerOptions}
-                  getOptionLabel={(e) => `${e.label}`} 
+                  getOptionLabel={(e) => `${e.label}`}
                   onChange={(selected) =>
                     setFormData({
                       ...formData,
@@ -518,4 +518,4 @@ const applicationTracker = () => {
   );
 };
 
-export default applicationTracker;
+export default ApplicationTracker;

@@ -8,8 +8,8 @@ import {
 import { baseUrl } from "../api";
 import axios from "axios";
 import { toast } from "react-toastify";
-import MiniLoading from "../components/miniLoading";
-import moment from "moment"
+import MiniLoading from "../components/MiniLoading";
+import moment from "moment";
 
 const statusColors = {
   onhold: "bg-yellow-100 text-yellow-800",
@@ -20,11 +20,11 @@ const statusColors = {
 };
 
 const TeamsPage = () => {
-  const token = localStorage.getItem('token')
+  const token = localStorage.getItem("token");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCandidate, setSelectedCandidate] = useState(null);
-  const [loading, setLoading] = useState(true)
-  const [hrData, setHrData] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [hrData, setHrData] = useState([]);
 
   const filteredData = hrData.filter((c) => {
     const fullName = `${c.user.firstName} ${c.user.lastName}`.toLowerCase();
@@ -44,7 +44,6 @@ const TeamsPage = () => {
     );
   });
 
-
   useEffect(() => {
     const getAllCandidates = async () => {
       try {
@@ -60,7 +59,10 @@ const TeamsPage = () => {
           setHrData(response.data.data);
         }
       } catch (error) {
-        console.error("Candidate Fetch Error:", error?.response?.data || error.message);
+        console.error(
+          "Candidate Fetch Error:",
+          error?.response?.data || error.message
+        );
         toast.error("Failed to fetch assigned candidates.");
       } finally {
         setLoading(false);
@@ -75,7 +77,6 @@ const TeamsPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       <div className="mb-6 border-b border-gray-200 pb-4">
-
         <div className="flex flex-col md:flex-row md:items-center md:justify-between  gap-4">
           <h2 className="text-3xl font-bold text-gray-800">Team Overview</h2>
           <div className="relative w-full max-w-md">
@@ -88,7 +89,6 @@ const TeamsPage = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
         </div>
       </div>
 
@@ -133,8 +133,9 @@ const TeamsPage = () => {
                   <td className="px-4 py-3 text-sm text-gray-500">{c.email}</td>
                   <td className="px-4 py-3">
                     <span
-                      className={`text-xs font-medium px-3 py-1 rounded-full ${statusColors[c.status] || "bg-gray-100 text-gray-800"
-                        }`}
+                      className={`text-xs font-medium px-3 py-1 rounded-full ${
+                        statusColors[c.status] || "bg-gray-100 text-gray-800"
+                      }`}
                     >
                       {c.status}
                     </span>
@@ -193,9 +194,10 @@ const TeamsPage = () => {
               <div>
                 <span className="font-semibold text-gray-700">Status:</span>
                 <span
-                  className={`ml-1 text-xs font-medium px-3 py-1 rounded-full ${statusColors[selectedCandidate.status] ||
+                  className={`ml-1 text-xs font-medium px-3 py-1 rounded-full ${
+                    statusColors[selectedCandidate.status] ||
                     "bg-gray-100 text-gray-800"
-                    }`}
+                  }`}
                 >
                   {selectedCandidate.status}
                 </span>
@@ -203,22 +205,23 @@ const TeamsPage = () => {
               <div className="col-span-2">
                 <span className="font-semibold text-gray-700">Skills:</span>
                 <div className="flex flex-wrap gap-2 mt-1">
-                  {selectedCandidate.skills
-                    .split(",")
-                    .map((skill, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
-                      >
-                        {skill.trim()}
-                      </span>
-                    ))}
-
+                  {selectedCandidate.skills.split(",").map((skill, idx) => (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800"
+                    >
+                      {skill.trim()}
+                    </span>
+                  ))}
                 </div>
               </div>
               <div>
                 <span className="font-semibold text-gray-700">HR:</span>
-                <div>{selectedCandidate.user.firstName + " " + selectedCandidate.user.lastName}</div>
+                <div>
+                  {selectedCandidate.user.firstName +
+                    " " +
+                    selectedCandidate.user.lastName}
+                </div>
               </div>
               <div>
                 <span className="font-semibold text-gray-700">
@@ -233,10 +236,10 @@ const TeamsPage = () => {
                     <a
                       href={
                         selectedCandidate.resume.endsWith(".doc") ||
-                          selectedCandidate.resume.endsWith(".docx")
+                        selectedCandidate.resume.endsWith(".docx")
                           ? `https://view.officeapps.live.com/op/view.aspx?src=${encodeURIComponent(
-                            `${baseUrl}/${selectedCandidate.resume}`
-                          )}`
+                              `${baseUrl}/${selectedCandidate.resume}`
+                            )}`
                           : `${baseUrl}/${selectedCandidate.resume}`
                       }
                       target="_blank"

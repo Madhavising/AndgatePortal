@@ -319,14 +319,14 @@ const CandidateRegistration = () => {
                       required
                     >
                       <option value="">Select</option>
+
                       {hrList &&
-                        hrList.map((e) => {
-                          return (
-                            <option key={e._id} value={e._id}>
-                              {e.firstName + " " + e.lastName}
-                            </option>
-                          );
-                        })}
+                        hrList.map((e) => (
+                          <option key={e._id} value={e._id}>
+                            {e.firstName} {e.lastName}
+                          </option>
+                        ))}
+                      <option value="others">Others</option>
                     </select>
                   </div>
                   <div className="flex flex-col">
@@ -356,7 +356,9 @@ const CandidateRegistration = () => {
                     />
                   </div>
                   <div className="flex flex-col">
-                    <label>Graduation Year</label>
+                    <label>
+                      Graduation Year <span className="text-red-500">*</span>
+                    </label>
                     <input
                       type="month"
                       name="graduationYear"
@@ -418,7 +420,6 @@ const CandidateRegistration = () => {
                       </option>
                       <option value="Software">Software</option>
                       <option value="STA">STA</option>
-                      <option value="STA">Others</option>
                     </select>
                   </div>
                   <div className="flex flex-col">
@@ -634,7 +635,7 @@ const CandidateRegistration = () => {
                 <div className="flex flex-col">
                   <label>
                     Relevant Experience
-                    <span className="text-red-500">*</span>
+                    <span className="text-red-500"> *</span>
                   </label>
                   <input
                     type="text"
@@ -739,7 +740,7 @@ const CandidateRegistration = () => {
                 <div className="flex flex-col">
                   <label>
                     Companies you have applied within last 6 months
-                    <span className="text-red-500">*</span>
+                    <span className="text-red-500"> *</span>
                   </label>
                   <input
                     type="text"
