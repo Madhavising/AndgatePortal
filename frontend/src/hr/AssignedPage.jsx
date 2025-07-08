@@ -178,6 +178,7 @@ import CandidateInformation from "../components/CandidateInformation";
 import CandidateTable from "../components/CandidateTable";
 import RemarkModal from "../components/RemarkModal";
 import MiniLoading from "../components/MiniLoading";
+import { Search } from "lucide-react";
 
 const AssignedCandidatePage = () => {
   const token = localStorage.getItem("token");
@@ -345,6 +346,7 @@ const AssignedCandidatePage = () => {
                 className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
               >
                 <FaArrowLeft className="text-base" />
+             
                 <span>Back to List</span>
               </button>
             </div>

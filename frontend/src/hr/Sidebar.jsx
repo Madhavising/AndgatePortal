@@ -12,6 +12,7 @@ import {
   BriefcaseIcon,
   UserCircleIcon,
   UsersRoundIcon,
+  User,
 } from "lucide-react";
 
 const navItems = [
@@ -21,6 +22,7 @@ const navItems = [
   { to: "/assigned-candidates", label: "Assigned Candidates", icon: Users },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
   { to: "/settings", label: "Settings", icon: Settings },
+  { to: "/user", label: "Users", icon: User },
 ];
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
