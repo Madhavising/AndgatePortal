@@ -1,6 +1,9 @@
 const UploadModel = require('../models/upload');
 const path = require('path');
 const CandidateModel = require("../models/candidate")
+const transporter = require("../utils/mailer");
+const { htmlTemplate } = require('../utils/emailTemplates');
+
 
 exports.getAllUnassignedCanditates = async (req, res) => {
     try {
@@ -24,7 +27,7 @@ exports.getAllUnassignedCanditates = async (req, res) => {
 exports.getAssignedCanditatesToMe = async (req, res) => {
     const user = req.user;
     try {
-        const allAssigned = await CandidateModel.find({ assignedTo: user._id, status: { $ne: "rejected" } }).lean().exec();
+        const allAssigned = await CandidateModel.find({ assignedTo: user._id, status: { $ne: "rejected" } }).sort({ createdAt: -1 }).lean().exec();
 
         return res.status(200).json({
             status: true,
@@ -147,13 +150,9 @@ exports.fresherRegistration = async (req, res) => {
         skills
     };
 
-    const missingFields = [];
-
-    for (const [field, value] of Object.entries(requiredFields)) {
-        if (!value || (typeof value === 'string' && value.trim() === '')) {
-            missingFields.push(field);
-        }
-    }
+    const missingFields = Object.entries(requiredFields)
+        .filter(([_, value]) => !value || (typeof value === 'string' && value.trim() === ''))
+        .map(([key]) => key);
 
     if (missingFields.length > 0) {
         return res.status(400).json({
@@ -164,7 +163,23 @@ exports.fresherRegistration = async (req, res) => {
     }
 
     try {
-        const candidate = new CandidateModel({
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        const previousRejected = await CandidateModel.findOne({
+            email: email,
+            status: 'rejected',
+            updatedAt: { $gte: sixMonthsAgo }
+        });
+
+        if (previousRejected) {
+            return res.status(403).json({
+                status: false,
+                message: 'You cannot apply again within 6 months of being rejected.'
+            });
+        }
+
+        const candidateData = {
             availability,
             degree,
             domain,
@@ -177,14 +192,32 @@ exports.fresherRegistration = async (req, res) => {
             currentLocation,
             resume,
             skills,
-        });
+            ...(poc && { assignedTo: poc, isAssigned: true })
+        };
 
-        if (poc) {
-            candidate.assignedTo = poc;
-            candidate.isAssigned = true
-        }
-
+        const candidate = new CandidateModel(candidateData);
         await candidate.save();
+
+        // 📧 Send mail
+        const personalizedHtml = htmlTemplate.replace('{{candidateName}}', candidate.name);
+
+        const mailOptions = {
+            from: `"Andgate HR Team" <${process.env.SMTP_USER}>`,
+            to: candidate.email,
+            subject: "Thanks for applying to Andgate",
+            text: `Dear ${candidate.name},\n\nYour application has been accepted. We will contact you soon with next steps.\n\n- Andgate HR Team`,
+            html: personalizedHtml
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+
+        if (info.rejected.length > 0) {
+            return res.status(500).json({
+                status: false,
+                message: 'Email rejected, Please provide valid Email.',
+                error: `Email rejected for: ${info.rejected.join(', ')}`
+            });
+        }
 
         return res.status(200).json({
             status: true,
@@ -193,13 +226,15 @@ exports.fresherRegistration = async (req, res) => {
         });
 
     } catch (error) {
-        console.error('Registration save error:', error);
+        console.error('Registration error:', error);
         return res.status(500).json({
             status: false,
-            message: 'Internal server error'
+            message: 'Internal server error',
+            error: error.message
         });
     }
 };
+
 
 exports.experiencedRegistration = async (req, res) => {
     const {
@@ -277,6 +312,22 @@ exports.experiencedRegistration = async (req, res) => {
     }
 
     try {
+        const sixMonthsAgo = new Date();
+        sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+        const previousRejected = await CandidateModel.findOne({
+            email: email,
+            status: 'rejected',
+            updatedAt: { $gte: sixMonthsAgo }
+        });
+
+        if (previousRejected) {
+            return res.status(403).json({
+                status: false,
+                message: 'You cannot apply again within 6 months of being rejected.'
+            });
+        }
+
         const candidate = new CandidateModel({
             availability,
             bondDetails,
@@ -313,6 +364,26 @@ exports.experiencedRegistration = async (req, res) => {
         }
 
         await candidate.save();
+
+        const personalizedHtml = htmlTemplate.replace('{{candidateName}}', candidate.name);
+
+        const mailOptions = {
+            from: `"Andgate HR Team" <${process.env.SMTP_USER}>`,
+            to: candidate.email,
+            subject: "Thanks for applying to Andgate",
+            text: `Dear ${candidate.name},\n\nYour application has been accepted. We will contact you soon with next steps.\n\n- Andgate HR Team`,
+            html: personalizedHtml
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+
+        if (info.rejected.length > 0) {
+            return res.status(500).json({
+                status: false,
+                message: 'Email rejected, Please provide valid Email.',
+                error: `Email rejected for: ${info.rejected.join(', ')}`
+            });
+        }
 
         return res.status(200).json({
             status: true,
