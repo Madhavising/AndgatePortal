@@ -4,22 +4,19 @@ import { useSelector } from "react-redux";
 
 // Layouts & Pages
 import Layout from "../layout/Layout";
-
-import Dashboard from "../pages/dashboard/Dashboard";
-
-import HrLayout from "../layout/hrLayout";
-
-import CandidateList from "../hr/CandidateList";
-
-import Approvals from "../hr/Approvals";
-import HrSettings from "../hr/HrSetting";
-import HrDashboard from "../hr/HrDashboard";
-import AssignedCandidatePage from "../hr/AssignedPage";
+import HrLayout from "../layout/hrLayout"
+  ;
 import Unauthorized from "../pages/unauthorized";
 import LoginScreen from "../pages/AuthPage/login";
 import CandidateRegistration from "../pages/Registration/registrations";
 import ApplicationTracker from "../pages/Applications/applicationTracker";
+
 import TeamsPage from "../hr/Teams";
+import Approvals from "../hr/Approvals";
+import HrSettings from "../hr/HrSetting";
+import HrDashboard from "../hr/HrDashboard";
+import CandidateList from "../hr/CandidateList";
+import AssignedCandidatePage from "../hr/AssignedPage";
 
 
 // import UserDashboard from '../pages/UserPage/userDashboard';
@@ -27,12 +24,9 @@ import TeamsPage from "../hr/Teams";
 // import Unauthorized from '../pages/Common/unauthorized';
 
 // Route Wrappers
-const PrivateRoute = ({ isAuth }) =>
-  isAuth ? <Outlet /> : <Navigate to="/Login" replace />;
-const PublicRoute = ({ isAuth }) =>
-  !isAuth ? <Outlet /> : <Navigate to="/Dashboard" replace />;
-const AdminRoute = ({ user }) =>
-  user?.role === "admin" || user?.role === "hr" ? <Outlet /> : <Navigate to="/unauthorized" replace />;
+const PrivateRoute = ({ isAuth }) => isAuth ? <Outlet /> : <Navigate to="/Login" replace />;
+const PublicRoute = ({ isAuth }) => !isAuth ? <Outlet /> : <Navigate to="/Dashboard" replace />;
+const AdminRoute = ({ user }) => user?.role === "admin" || user?.role === "hr" ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 // const SuperAdminRoute = ({ user }) => user?.role === 'superadmin' ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 // const UserRoute = ({ user }) => user?.role === 'User' ? <Outlet /> : <Navigate to="/unauthorized" replace />;
 
@@ -41,45 +35,33 @@ const AppRouter = ({ isAuth }) => {
 
   return (
     <Routes>
-      {/* Public */}
-      <Route element={<PublicRoute isAuth={isAuth} />}>
+
+      <Route element={<PublicRoute isAuth={isAuth} />}> {/* Public */}
         <Route path="/login" element={<LoginScreen />} />
-        <Route
-          path="/candidate-registration"
-          element={<CandidateRegistration />}
-        />
+        <Route path="/candidate-registration" element={<CandidateRegistration />} />
       </Route>
 
-      {/* Private */}
-      <Route element={<PrivateRoute isAuth={isAuth} />}>
-        {/* Admin Route */}
-        <Route element={<AdminRoute user={user} />}>
-          <Route element={<HrLayout />}>
-            <Route path="/dashboard" element={<HrDashboard />} />
-            {/* Add more admin routes here */}
-            <Route path="/teams" element={<TeamsPage />} />
-            <Route path="/candidates" element={<CandidateList />} />
-            <Route
-              path="/assigned-candidates"
-              element={<AssignedCandidatePage />}
-            />
+      <Route element={<PrivateRoute isAuth={isAuth} />}> {/* Private */}
 
+        <Route element={<AdminRoute user={user} />}>  {/* HR Portal */}
+          <Route element={<HrLayout />}>
+            <Route path="/teams" element={<TeamsPage />} />
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/settings" element={<HrSettings />} />
-            <Route
-              path="/application-tracker"
-              element={<ApplicationTracker />}
-            />
+            <Route path="/dashboard" element={<HrDashboard />} />
+            <Route path="/candidates" element={<CandidateList />} />
+            <Route path="/application-tracker" element={<ApplicationTracker />} />
+            <Route path="/assigned-candidates" element={<AssignedCandidatePage />} />
           </Route>
         </Route>
 
-        {/* <Route element={<SuperAdminRoute user={user} />}>
+        {/* <Route element={<SuperAdminRoute user={user} />}> Super Admin Routes
           <Route element={<Layout />}>
             <Route path="/superadmin" element={<SuperAdminPanel />} />
           </Route>
         </Route> */}
 
-        {/* <Route element={<UserRoute user={user} />}>
+        {/* <Route element={<UserRoute user={user} />}> User Routes
           <Route element=  {<Layout />}>
             <Route path="/user-dashboard" element={<UserDashboard />} />
           </Route>
@@ -90,10 +72,7 @@ const AppRouter = ({ isAuth }) => {
       <Route path="/unauthorized" element={<Unauthorized />} />
 
       {/* Catch-All */}
-      <Route
-        path="*"
-        element={<Navigate to={isAuth ? "/dashboard" : "/login"} replace />}
-      />
+      <Route path="*" element={<Navigate to={isAuth ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );
 };
