@@ -25,7 +25,7 @@ jobs:
           cd /var/www/html/AndgatePortal
 
           echo "📥 Pulling latest code from GitHub..."
-          git pull origin main
+          git pull
 
           echo "🛠 Installing frontend dependencies..."
           cd frontend
