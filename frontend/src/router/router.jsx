@@ -13,7 +13,7 @@ import Approvals from "../hr/Approvals";
 import HrSettings from "../hr/HrSetting";
 import HrDashboard from "../hr/HrDashboard";
 import AssignedCandidatePage from "../hr/AssignedPage";
-import Unauthorized from "../pages/unauthorized";
+import Unauthorized from "../pages/Unauthorized";
 import LoginScreen from "../pages/authPage/Login";
 
 import TeamsPage from "../hr/Teams";

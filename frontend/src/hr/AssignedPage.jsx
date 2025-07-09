@@ -346,7 +346,7 @@ const AssignedCandidatePage = () => {
                 className="flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:underline transition-colors"
               >
                 <FaArrowLeft className="text-base" />
-             
+
                 <span>Back to List</span>
               </button>
             </div>

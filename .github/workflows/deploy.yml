@@ -1,0 +1,45 @@
+name: Deploy AndgatePortal to AWS
+
+on:
+  push:
+    branches:
+      - myWork # or 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.9.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Deploy to AWS Server
+      run: |
+        ssh -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} << 'EOF'
+          echo "🔄 Switching to project directory..."
+          cd /var/www/html/AndgatePortal
+
+          echo "📥 Pulling latest code from GitHub..."
+          git pull
+
+          echo "🛠 Installing frontend dependencies..."
+          cd frontend
+          npm install
+
+          echo "🏗 Building frontend..."
+          npm run build
+
+          echo "📦 Installing backend dependencies..."
+          cd ../backend
+          npm install
+
+          echo "🚀 Restarting Node.js backend with PM2..."
+          pm2 restart AndgateHRserver || pm2 start server.js --name AndgateHRserver
+
+          echo "✅ Deployment complete!"
+        EOF

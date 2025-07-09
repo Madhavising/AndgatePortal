@@ -106,7 +106,7 @@ const CandidateTable = ({
 
                   {isAssignedTable && (
                     <>
-                      <td className="px-6 py-4">
+                      <td className="px-0 py-0">
                         <input
                           type="text"
                           value={c.remarks || ""}
@@ -114,22 +114,22 @@ const CandidateTable = ({
                             handleRemarkChange(c._id, e.target.value)
                           }
                           placeholder="Enter remarks"
-                          className="w-full border rounded-md px-2 py-1 text-sm"
+                          className="w-[90px] border border-gray-300 rounded px-1 py-0.5 text-xs"
                         />
                       </td>
-                      <td className="px-6 py-4">
-                        <div className="flex space-x-1">
+                      <td className="px-0 py-1 w-[50px]">
+                        <div className="flex space-x-0.5">
                           {[1, 2, 3, 4, 5].map((star) =>
                             star <= c.rating ? (
                               <FaStar
                                 key={star}
-                                className="text-yellow-400 cursor-pointer"
+                                className="text-yellow-400 cursor-pointer text-sm"
                                 onClick={() => handleRatingChange(c._id, star)}
                               />
                             ) : (
                               <FaRegStar
                                 key={star}
-                                className="text-gray-400 cursor-pointer"
+                                className="text-gray-400 cursor-pointer text-sm"
                                 onClick={() => handleRatingChange(c._id, star)}
                               />
                             )

@@ -5,7 +5,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // 🧩 Internal Imports
-import AppRouter from "./router/router";
+import AppRouter from "./router/Router";
 import Loading from "./components/Loading";
 import { initializeAuth } from "./utils/auth";
 import "./App.css";
