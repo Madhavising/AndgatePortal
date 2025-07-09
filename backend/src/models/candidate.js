@@ -1,16 +1,17 @@
 const mongoose = require("mongoose");
 
-const candidateSchema = new mongoose.Schema({
+const candidateSchema = new mongoose.Schema(
+  {
     name: { type: String, required: true },
     email: {
-        type: String,
-        required: true,
-        match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
-        lowercase: true,
-        trim: true,
-        unique: true,
+      type: String,
+      required: true,
+      match: [/^\S+@\S+\.\S+$/, "Please enter a valid email address"],
+      lowercase: true,
+      trim: true,
+      unique: true,
     },
-    mobile: { type: String, required: true },
+    mobile: { type: String, required: true, unique: true },
     degree: { type: String },
     domain: { type: String },
     graduationYear: { type: String },
@@ -37,11 +38,27 @@ const candidateSchema = new mongoose.Schema({
     isExperienced: { type: Boolean, default: false },
     isAssigned: { type: Boolean, default: false },
     assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    status: { type: String, enum: ["pending", "assigned", "onhold", "approved", "employee", "tranee", "deployed", "rejected"], default: "pending", required: true },
-    remark: { type: "String" }
-}, {
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "assigned",
+        "onhold",
+        "approved",
+        "employee",
+        "tranee",
+        "deployed",
+        "rejected",
+      ],
+      default: "pending",
+      required: true,
+    },
+    remark: { type: "String" },
+  },
+  {
     versionKey: false,
-    timestamps: true
-});
+    timestamps: true,
+  }
+);
 
 module.exports = mongoose.model("candidate", candidateSchema);

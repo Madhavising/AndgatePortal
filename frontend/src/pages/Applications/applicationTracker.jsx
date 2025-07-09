@@ -294,6 +294,8 @@
 
 // export default ApplicationTracker;
 
+
+
 import React, { useState } from "react";
 import Select from "react-select";
 import { FaLock, FaPlus } from "react-icons/fa6";
@@ -317,31 +319,11 @@ const ApplicationTracker = () => {
   ];
 
   const interviewerOptions = [
-    {
-      value: "Udit Kishor",
-      label: "Udit Kishor",
-      email: "udit@andgatetech.com",
-    },
-    {
-      value: "Anjnesh Maindolia",
-      label: "Anjnesh Maindolia",
-      email: "anjnesh@andgatetech.com",
-    },
-    {
-      value: "Pradeep Kumar",
-      label: "Pradeep Kumar",
-      email: "pradeep@andgatetech.com",
-    },
-    {
-      value: "Madhavi Singh",
-      label: "Madhavi Singh",
-      email: "madhavi@andgatetech.com",
-    },
-    {
-      value: "Rahul Thakur",
-      label: "Rahul Thakur",
-      email: "rahul@andgatetech.com",
-    },
+    { value: "Udit Kishor", label: "Udit Kishor", email: "udit@andgatetech.com" },
+    { value: "Anjnesh Maindolia", label: "Anjnesh Maindolia", email: "anjnesh@andgatetech.com" },
+    { value: "Pradeep Kumar", label: "Pradeep Kumar", email: "pradeep@andgatetech.com" },
+    { value: "Madhavi Singh", label: "Madhavi Singh", email: "madhavi@andgatetech.com" },
+    { value: "Rahul Thakur", label: "Rahul Thakur", email: "rahul@andgatetech.com" },
   ];
 
   const handleChange = (e) => {
@@ -388,24 +370,12 @@ const ApplicationTracker = () => {
           👤 Candidate Info
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-sm text-gray-700">
-          <div>
-            <strong>Name:</strong> John Doe
-          </div>
-          <div>
-            <strong>Email:</strong> john@em.com
-          </div>
-          <div>
-            <strong>Phone:</strong> 9876543210
-          </div>
-          <div>
-            <strong>Domain:</strong> Backend
-          </div>
-          <div>
-            <strong>Experience:</strong> 2.5 Yrs
-          </div>
-          <div>
-            <strong>Skills:</strong> Node.js, MongoDB
-          </div>
+          <div><strong>Name:</strong> John Doe</div>
+          <div><strong>Email:</strong> john@em.com</div>
+          <div><strong>Phone:</strong> 9876543210</div>
+          <div><strong>Domain:</strong> Backend</div>
+          <div><strong>Experience:</strong> 2.5 Yrs</div>
+          <div><strong>Skills:</strong> Node.js, MongoDB</div>
         </div>
       </div>
 
@@ -427,10 +397,7 @@ const ApplicationTracker = () => {
           {/* Event Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <div
-                key={event.id}
-                className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white hover:shadow-md transition"
-              >
+              <div key={event.id} className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white hover:shadow-md transition">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="font-semibold text-lg text-blue-700">
                     {event.eventName}
@@ -447,21 +414,12 @@ const ApplicationTracker = () => {
                     {event.status}
                   </span>
                 </div>
-                <p>
-                  <strong>Interviewer:</strong> {event.interviewer?.label}
-                </p>
-                <p>
-                  <strong>Email:</strong> {event.email}
-                </p>
+                <p><strong>Interviewer:</strong> {event.interviewer?.label}</p>
+                <p><strong>Email:</strong> {event.email}</p>
                 {event.link && (
                   <p className="truncate">
                     <strong>Link:</strong>{" "}
-                    <a
-                      href={event.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-500 underline"
-                    >
+                    <a href={event.link} target="_blank" rel="noreferrer" className="text-blue-500 underline">
                       Join Meet
                     </a>
                   </p>
@@ -563,9 +521,7 @@ const ApplicationTracker = () => {
               </div>
 
               {/* Candidate Email & Link */}
-              {["Technical 1", "Technical 2", "Technical 3"].includes(
-                formData.eventName
-              ) && (
+              {["Technical 1", "Technical 2", "Technical 3"].includes(formData.eventName) && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
