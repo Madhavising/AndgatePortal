@@ -33,7 +33,7 @@ const candidateSchema = new mongoose.Schema(
     availability: { type: String },
     bondWilling: { type: String },
     bondDetails: { type: String },
-    poc: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    poc: { type: String },
     resume: { type: String },
     isExperienced: { type: Boolean, default: false },
     isAssigned: { type: Boolean, default: false },
