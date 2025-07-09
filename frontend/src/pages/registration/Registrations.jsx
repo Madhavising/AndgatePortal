@@ -259,6 +259,7 @@ const CandidateRegistration = () => {
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-10 flex  justify-center overflow-hidden">
       <ToastContainer position="top-right" autoClose={3000} />
+
       <div className="w-full max-w-5xl bg-white shadow-xl rounded-2xl p-4 space-y-8">
         <h2 className="text-2xl font-semibold text-gray-800 text-center">
           Candidate Registration Form

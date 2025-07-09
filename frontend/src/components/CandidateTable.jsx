@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FaEye, FaUserPlus } from "react-icons/fa";
+import { FaEye, FaUserPlus, FaStar, FaRegStar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import { FaStar, FaRegStar } from "react-icons/fa";
 
 const CandidateTable = ({
   candidates = [],
@@ -17,7 +16,7 @@ const CandidateTable = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleResize = () => setIsMobileView(window.innerWidth < 1024);
+    const handleResize = () => setIsMobileView(window.innerWidth < 1180);
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -74,50 +73,68 @@ const CandidateTable = ({
       {/* ✅ Desktop View */}
       {!isMobileView && (
         <div className="overflow-x-auto bg-white border border-gray-200 shadow-sm rounded-xl">
-          <table className="w-full min-w-[950px] text-sm text-left">
-            <thead className="bg-gray-100 text-gray-700 uppercase text-xs border-b sticky top-0 z-10">
+          <table className="w-full text-sm text-left table-auto">
+            <thead className="bg-gray-50 text-gray-700 uppercase text-xs border-b sticky top-0 z-10 font-medium">
               <tr>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Email</th>
-                <th className="px-6 py-3">Phone</th>
-                <th className="px-6 py-3">Domain</th>
-                <th className="px-6 py-3">Experience</th>
-                <th className="px-6 py-3">Status</th>
+                <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Email</th>
+                <th className="px-4 py-3">Phone</th>
+                <th className="px-4 py-3">Domain</th>
+                <th className="px-4 py-3">Experience</th>
+                <th className="px-4 py-3">Status</th>
                 {isAssignedTable && (
                   <>
-                    <th className="px-6 py-3">Remarks</th>
-                    <th className="px-6 py-3">Rating</th>
+                    <th className="px-4 py-3">Remarks</th>
+                    <th className="px-4 py-3">Rating</th>
                   </>
                 )}
-                <th className="px-6 py-3 text-center">Actions</th>
+                <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-y text-sm">
               {candidateData.map((c) => (
-                <tr key={c._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium">{c.name}</td>
-                  <td className="px-6 py-4">{c.email}</td>
-                  <td className="px-6 py-4">{c.mobile}</td>
-                  <td className="px-6 py-4">{c.domain || "—"}</td>
-                  <td className="px-6 py-4">
+                <tr key={c._id} className="hover:bg-gray-100 transition">
+                  <td
+                    className="px-4 py-3 truncate max-w-[130px]"
+                    title={c.name}
+                  >
+                    {c.name}
+                  </td>
+                  <td
+                    className="px-4 py-3 truncate max-w-[190px]"
+                    title={c.email}
+                  >
+                    {c.email}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">{c.mobile}</td>
+                  <td
+                    className="px-4 py-3 truncate max-w-[100px]"
+                    title={c.domain}
+                  >
+                    {c.domain || "—"}
+                  </td>
+                  <td
+                    className="px-4 py-3 max-w-[30px] truncate whitespace-nowrap"
+                    title={c.experienceYears}
+                  >
                     {c.experienceYears || "Fresher"}
                   </td>
-                  <td className="px-6 py-4">{renderStatusBadge(c.status)}</td>
+                  <td className="px-4 py-3">{renderStatusBadge(c.status)}</td>
 
                   {isAssignedTable && (
                     <>
-                      <td className="px-0 py-0">
+                      <td className="px-2 py-2">
                         <input
                           type="text"
                           value={c.remarks || ""}
                           onChange={(e) =>
                             handleRemarkChange(c._id, e.target.value)
                           }
-                          placeholder="Enter remarks"
-                          className="w-[90px] border border-gray-300 rounded px-1 py-0.5 text-xs"
+                          className="w-[100px] border border-gray-300 rounded px-2 py-1 text-xs"
+                          placeholder="Remarks"
                         />
                       </td>
-                      <td className="px-0 py-1 w-[50px]">
+                      <td className="px-2 py-2 w-[80px]">
                         <div className="flex space-x-0.5">
                           {[1, 2, 3, 4, 5].map((star) =>
                             star <= c.rating ? (
@@ -139,19 +156,17 @@ const CandidateTable = ({
                     </>
                   )}
 
-                  <td className="px-6 py-4 text-center space-x-2">
+                  <td className="px-4 py-3 text-center space-x-2">
                     <button
                       onClick={() => onView(c)}
-                      className="text-white bg-blue-600 hover:bg-blue-700 px-3 py-2 rounded-md text-sm"
-                      title="View"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-md text-sm"
                     >
                       <FaEye />
                     </button>
                     {showAssignButton && (
                       <button
                         onClick={() => onAssign(c._id)}
-                        className="text-white bg-green-600 hover:bg-green-700 px-3 py-2 rounded-md text-sm"
-                        title="Assign"
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-md text-sm"
                       >
                         <FaUserPlus />
                       </button>
@@ -166,7 +181,7 @@ const CandidateTable = ({
 
       {/* ✅ Mobile View */}
       {isMobileView && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4  px-2 py-2">
           {candidateData.map((c) => (
             <div
               key={c._id}

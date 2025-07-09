@@ -17,9 +17,10 @@ import Unauthorized from "../pages/Unauthorized";
 import LoginScreen from "../pages/authPage/Login";
 
 import TeamsPage from "../hr/Teams";
-import CandidateRegistration from "../pages/registration/Registrations";
+
 import ApplicationTracker from "../pages/applications/ApplicationTracker";
 import UserPage from "../pages/user/User";
+import CandidateRegistration from "../pages/registration/Registrations";
 
 // import UserDashboard from '../pages/UserPage/userDashboard';
 // import SuperAdminPanel from '../pages/SuperAdmin/panel';
