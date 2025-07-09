@@ -3,7 +3,7 @@ name: Deploy AndgatePortal to AWS
 on:
   push:
     branches:
-      - main  # or your branch name
+      - myWork  # or your branch name
 
 jobs:
   deploy:
