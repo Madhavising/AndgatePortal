@@ -14,10 +14,10 @@ const CandidateList = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedRating, setSelectedRating] = useState("");
 
   // Capitalize first letter utility
-  const capitalizeFirst = (str) =>
-    str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
   // Fetch all candidates
   useEffect(() => {
@@ -34,7 +34,10 @@ const CandidateList = () => {
           setCandidates(response.data.data);
         }
       } catch (error) {
-        console.error("Fetch Candidates Error:", error?.response?.data || error.message);
+        console.error(
+          "Fetch Candidates Error:",
+          error?.response?.data || error.message
+        );
         toast.error("Failed to load candidates.");
       }
     };
@@ -61,7 +64,10 @@ const CandidateList = () => {
         setRefreshKey((prev) => prev + 1);
       }
     } catch (error) {
-      console.error("Assign Candidate Error:", error?.response?.data || error.message);
+      console.error(
+        "Assign Candidate Error:",
+        error?.response?.data || error.message
+      );
       toast.error("Failed to assign candidate.");
     }
   };
@@ -88,7 +94,10 @@ const CandidateList = () => {
         toast.error("Failed to update status");
       }
     } catch (error) {
-      console.error("Status Update Error:", error?.response?.data || error.message);
+      console.error(
+        "Status Update Error:",
+        error?.response?.data || error.message
+      );
       toast.error("Status update failed");
     }
   };
@@ -96,14 +105,19 @@ const CandidateList = () => {
   // Filter candidates based on search term
   const filteredCandidates = candidates.filter((c) => {
     const term = searchTerm.toLowerCase();
-    return (
+    const matchesSearch =
       c.email.toLowerCase().includes(term) ||
       c.name.toLowerCase().includes(term) ||
       c.status.toLowerCase().includes(term) ||
       c.mobile.toLowerCase().includes(term) ||
-      c.domain.toLowerCase().includes(term)
-      // c.experienceYears.includes(term)
-    );
+      c.domain.toLowerCase().includes(term) ||
+      c.experienceYears.includes(term);
+
+    const matchesRating = selectedRating
+      ? c.rating >= Number(selectedRating)
+      : true;
+
+    return matchesSearch && matchesRating;
   });
 
   return (

@@ -43,7 +43,7 @@ const CandidateInformation = ({
         {/* Action Buttons */}
         <div className="flex flex-row justify-end gap-2 mb-3 overflow-x-auto">
           <button
-            onClick={() => handleStatusUpdate("onhold")}
+            onClick={() => handleStatusUpdate("Onhold")}
             className="min-w-[100px] bg-orange-500 hover:bg-orange-600 text-white px-4 py-1.5 rounded text-sm text-center"
           >
             On Hold
@@ -51,7 +51,7 @@ const CandidateInformation = ({
 
           {isAssignedTableButton && (
             <button
-              onClick={() => handleStatusUpdate("assigned")}
+              onClick={() => handleStatusUpdate("Assigned")}
               className="min-w-[100px] bg-green-500 hover:bg-green-600 text-white px-4 py-1.5 rounded text-sm text-center"
             >
               Accept
@@ -59,7 +59,7 @@ const CandidateInformation = ({
           )}
 
           <button
-            onClick={() => handleStatusUpdate("rejected")}
+            onClick={() => handleStatusUpdate("Rejected")}
             className="min-w-[100px] bg-red-500 hover:bg-red-600 text-white px-4 py-1.5 rounded text-sm text-center"
           >
             Reject

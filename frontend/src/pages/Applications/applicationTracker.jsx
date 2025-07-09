@@ -300,6 +300,7 @@ import { FaLock, FaPlus } from "react-icons/fa6";
 
 const ApplicationTracker = () => {
   const [showModal, setShowModal] = useState(false);
+  const [events, setEvents] = useState([]);
   const [formData, setFormData] = useState({
     eventName: "",
     interviewer: null,
@@ -349,13 +350,32 @@ const ApplicationTracker = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Event Submitted:", formData);
+    const newEvent = {
+      ...formData,
+      id: Date.now(),
+      feedback: "",
+      status: "Pending",
+    };
+    setEvents([...events, newEvent]);
     setShowModal(false);
     setFormData({ eventName: "", interviewer: null, email: "", link: "" });
   };
 
+  const handleFeedbackChange = (id, value) => {
+    setEvents((prev) =>
+      prev.map((ev) => (ev.id === id ? { ...ev, feedback: value } : ev))
+    );
+  };
+
+  const handleStatusChange = (id, newStatus) => {
+    setEvents((prev) =>
+      prev.map((ev) => (ev.id === id ? { ...ev, status: newStatus } : ev))
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto py-10 px-4">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
         <h1 className="text-2xl font-bold text-gray-900">
           🎯 Application Tracker
@@ -403,8 +423,86 @@ const ApplicationTracker = () => {
               <FaPlus /> Add Event
             </button>
           </div>
+
+          {/* Event Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Show added events here if needed */}
+            {events.map((event) => (
+              <div
+                key={event.id}
+                className="border border-gray-200 p-4 rounded-lg shadow-sm bg-white hover:shadow-md transition"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <h3 className="font-semibold text-lg text-blue-700">
+                    {event.eventName}
+                  </h3>
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      event.status === "Selected"
+                        ? "bg-green-100 text-green-700"
+                        : event.status === "Rejected"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-yellow-100 text-yellow-700"
+                    }`}
+                  >
+                    {event.status}
+                  </span>
+                </div>
+                <p>
+                  <strong>Interviewer:</strong> {event.interviewer?.label}
+                </p>
+                <p>
+                  <strong>Email:</strong> {event.email}
+                </p>
+                {event.link && (
+                  <p className="truncate">
+                    <strong>Link:</strong>{" "}
+                    <a
+                      href={event.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      Join Meet
+                    </a>
+                  </p>
+                )}
+                <div className="mt-2">
+                  <textarea
+                    rows={2}
+                    placeholder="Add Feedback"
+                    className="w-full border px-2 py-1 rounded text-sm"
+                    value={event.feedback}
+                    onChange={(e) =>
+                      handleFeedbackChange(event.id, e.target.value)
+                    }
+                  />
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => handleStatusChange(event.id, "Selected")}
+                    disabled={event.status !== "Pending"}
+                    className={`px-3 py-1 rounded text-sm w-full ${
+                      event.status === "Selected"
+                        ? "bg-green-400 text-white cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700 text-white"
+                    }`}
+                  >
+                    Select
+                  </button>
+                  <button
+                    onClick={() => handleStatusChange(event.id, "Rejected")}
+                    disabled={event.status !== "Pending"}
+                    className={`px-3 py-1 rounded text-sm w-full ${
+                      event.status === "Rejected"
+                        ? "bg-red-400 text-white cursor-not-allowed"
+                        : "bg-red-600 hover:bg-red-700 text-white"
+                    }`}
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -433,7 +531,7 @@ const ApplicationTracker = () => {
                 />
               </div>
 
-              {/* Interviewer (Search by Name) */}
+              {/* Interviewer */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Interviewer
@@ -444,55 +542,59 @@ const ApplicationTracker = () => {
                   onChange={(selected) =>
                     setFormData({
                       ...formData,
-                      interviewer: selected, // Save full object
+                      interviewer: selected,
                     })
                   }
                   placeholder="Search by name..."
                 />
               </div>
 
-              {/* Interviewer Email (auto-filled from selected interviewer) */}
-              <div className="mt-2">
+              {/* Interviewer Email */}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Interviewer Email
                 </label>
                 <input
                   type="email"
-                  name="interviewerEmail"
-                  value={formData.interviewer?.email || ""}
                   readOnly
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100"
+                  className="w-full border bg-gray-100 border-gray-300 rounded px-3 py-2 text-sm"
+                  value={formData.interviewer?.email || ""}
                 />
               </div>
 
-              {/* Candidate Email */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Candidate Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                />
-              </div>
+              {/* Candidate Email & Link */}
+              {["Technical 1", "Technical 2", "Technical 3"].includes(
+                formData.eventName
+              ) && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Candidate Email
+                    </label>
+                    <input
+                      type="email"
+                      name="email"
+                      required
+                      value={formData.email}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
 
-              {/* Event Link */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Event Link
-                </label>
-                <input
-                  type="text"
-                  name="link"
-                  value={formData.link}
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                />
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Meet Link
+                    </label>
+                    <input
+                      type="text"
+                      name="link"
+                      value={formData.link}
+                      onChange={handleChange}
+                      className="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                    />
+                  </div>
+                </>
+              )}
 
               {/* Buttons */}
               <div className="flex justify-end gap-3 pt-4">

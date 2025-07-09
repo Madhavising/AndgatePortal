@@ -21,7 +21,7 @@ const navItems = [
   { to: "/candidates", label: "Candidates", icon: BriefcaseIcon },
   { to: "/assigned-candidates", label: "Assigned Candidates", icon: Users },
   { to: "/approvals", label: "Approvals", icon: CheckCircle },
-  { to: "/settings", label: "Settings", icon: Settings },
+  // { to: "/settings", label: "Settings", icon: Settings },
   { to: "/user", label: "Users", icon: User },
 ];
 
