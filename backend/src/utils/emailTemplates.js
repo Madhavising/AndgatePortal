@@ -1,4 +1,4 @@
-export const htmlTemplate = `
+const htmlTemplate = `
         <!DOCTYPE html>
         <html>
         <head>
@@ -95,3 +95,5 @@ export const htmlTemplate = `
         </body>
         </html>
 `;
+
+module.exports = htmlTemplate;

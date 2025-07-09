@@ -2,7 +2,7 @@ const UploadModel = require('../models/upload');
 const path = require('path');
 const CandidateModel = require("../models/candidate")
 const transporter = require("../utils/mailer");
-const { htmlTemplate } = require('../utils/emailTemplates');
+const htmlTemplate = require('../utils/emailTemplates');
 
 
 exports.getAllUnassignedCanditates = async (req, res) => {
