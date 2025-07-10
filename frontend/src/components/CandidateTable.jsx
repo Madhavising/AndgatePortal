@@ -63,7 +63,8 @@ const CandidateTable = ({
       <span
         className={`${base} ${color} cursor-pointer`}
         onClick={() => {
-          if (status === "Assigned") navigate("/application-tracker", {state: { candidate } });
+          if (status === "Assigned")
+            navigate("/application-tracker", { state: { candidate } });
         }}
       >
         {status || "Pending"}
@@ -80,11 +81,11 @@ const CandidateTable = ({
             <thead className="bg-gray-50 text-gray-700 uppercase text-xs border-b sticky top-0 z-10 font-medium">
               <tr>
                 <th className="px-4 py-3">Name</th>
+                <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Email</th>
                 <th className="px-4 py-3">Phone</th>
                 <th className="px-4 py-3">Domain</th>
                 <th className="px-4 py-3">Experience</th>
-                <th className="px-4 py-3">Status</th>
                 {isAssignedTable && (
                   <>
                     <th className="px-4 py-3">Remarks</th>
@@ -102,6 +103,9 @@ const CandidateTable = ({
                     title={c.name}
                   >
                     {c.name}
+                  </td>
+                  <td className="px-4 py-3">
+                    {renderStatusBadge(capitalizeFirst(c.status), c)}
                   </td>
                   <td
                     className="px-4 py-3 truncate max-w-[190px]"
@@ -122,7 +126,6 @@ const CandidateTable = ({
                   >
                     {c.experienceYears || "Fresher"}
                   </td>
-                  <td className="px-4 py-3">{renderStatusBadge(capitalizeFirst(c.status), c)}</td>
 
                   {isAssignedTable && (
                     <>

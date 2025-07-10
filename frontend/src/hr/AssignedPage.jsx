@@ -10,6 +10,7 @@ import CandidateTable from "../components/CandidateTable";
 import RemarkModal from "../components/RemarkModal";
 import MiniLoading from "../components/MiniLoading";
 import { Search } from "lucide-react";
+import CandidateFilter from "../components/CandidateFilter";
 
 const AssignedCandidatePage = () => {
   const token = localStorage.getItem("token");
@@ -21,12 +22,8 @@ const AssignedCandidatePage = () => {
   const [selectedCandidateId, setSelectedCandidateId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedRemark, setSelectedRemark] = useState("");
-
-  // Filters & Search
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedDomain, setSelectedDomain] = useState("");
-  const [selectedRating, setSelectedRating] = useState("");
-  const [selectedExperience, setSelectedExperience] = useState("");
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
+  const [selectedRating, setSelectedRating] = useState(null);
 
   const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
@@ -124,42 +121,6 @@ const AssignedCandidatePage = () => {
     }
   };
 
-  const filteredCandidates = useMemo(() => {
-    return assignedList.filter((candidate) => {
-      const matchesSearch =
-        candidate.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        candidate.phone?.includes(searchTerm);
-
-      const matchesDomain = selectedDomain
-        ? candidate.domain === selectedDomain
-        : true;
-
-      const matchesRating = selectedRating
-        ? String(candidate.rating) === selectedRating
-        : true;
-
-      const matchesExperience = (() => {
-        const exp = Number(candidate.experienceYears) || 0;
-        if (selectedExperience === "0-1") return exp >= 0 && exp <= 1;
-        if (selectedExperience === "1-3") return exp > 1 && exp <= 3;
-        if (selectedExperience === "3-5") return exp > 3 && exp <= 5;
-        if (selectedExperience === "5+") return exp > 5;
-        return true;
-      })();
-
-      return (
-        matchesSearch && matchesDomain && matchesRating && matchesExperience
-      );
-    });
-  }, [
-    assignedList,
-    searchTerm,
-    selectedDomain,
-    selectedRating,
-    selectedExperience,
-  ]);
-
   if (loading) return <MiniLoading />;
 
   return (
@@ -182,96 +143,11 @@ const AssignedCandidatePage = () => {
             </div>
 
             {/* Filters */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Search */}
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Search
-                </label>
-                <input
-                  type="text"
-                  placeholder="By name, email, or phone"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:outline-none"
-                />
-              </div>
-
-              {/* Domain */}
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Domain
-                </label>
-                <select
-                  value={selectedDomain}
-                  onChange={(e) => setSelectedDomain(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">All Domains</option>
-                  <option value="DFT">DFT</option>
-                  <option value="PD">PD</option>
-                  <option value="DV">DV</option>
-                  <option value="PDK">PDK</option>
-                  <option value="Analog Mixed Signaling">
-                    Analog Mixed Signaling
-                  </option>
-                  <option value="Analog Layout Design">
-                    Analog Layout Design
-                  </option>
-                  <option value="Design Engineer">Design Engineer</option>
-                  <option value="Synthesis">Synthesis</option>
-                  <option value="Physical Verification">
-                    Physical Verification
-                  </option>
-                  <option value="Embedded">Embedded</option>
-                  <option value="FPGA">FPGA</option>
-                  <option value="Design">Design</option>
-                  <option value="Analog Design">Analog Design</option>
-                  <option value="Formal Verification">
-                    Formal Verification
-                  </option>
-                  <option value="Software">Software</option>
-                  <option value="STA">STA</option>
-                  <option value="Others">Others</option>
-                </select>
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Rating
-                </label>
-                <select
-                  value={selectedRating}
-                  onChange={(e) => setSelectedRating(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">All Ratings</option>
-                  <option value="5">5⭐</option>
-                  <option value="4">4⭐ & above</option>
-                  <option value="3">3⭐ & above</option>
-                  <option value="2">2⭐ & above</option>
-                  <option value="1">1⭐</option>
-                </select>
-              </div>
-
-              {/* Experience */}
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Experience
-                </label>
-                <select
-                  value={selectedExperience}
-                  onChange={(e) => setSelectedExperience(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:outline-none"
-                >
-                  <option value="">All</option>
-                  <option value="0-1">0-1 yrs</option>
-                  <option value="1-3">1-3 yrs</option>
-                  <option value="3-5">3-5 yrs</option>
-                  <option value="5+">5+ yrs</option>
-                </select>
-              </div>
+            <div className="">
+              <CandidateFilter
+                candidates={assignedList}
+                onFilter={setFilteredCandidates}
+              />
             </div>
           </div>
 
@@ -283,6 +159,7 @@ const AssignedCandidatePage = () => {
               showEditButton={true}
               isAssignedTable={true}
               onEdit={handleEditClick}
+              selectedRating={selectedRating}
             />
           </div>
 

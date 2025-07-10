@@ -22,7 +22,7 @@ const TeamsPage = () => {
   const [loading, setLoading] = useState(true);
   const [hrData, setHrData] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const candidatesPerPage = 10;
+  const limit = 10;
 
   // Filter data
   const filteredData = hrData.filter((c) => {
@@ -46,13 +46,13 @@ const TeamsPage = () => {
     setCurrentPage(1);
   }, [searchTerm]);
 
-  const indexOfLastCandidate = currentPage * candidatesPerPage;
-  const indexOfFirstCandidate = indexOfLastCandidate - candidatesPerPage;
+  const indexOfLastCandidate = currentPage * limit;
+  const indexOfFirstCandidate = indexOfLastCandidate - limit;
   const currentCandidates = filteredData.slice(
     indexOfFirstCandidate,
     indexOfLastCandidate
   );
-  const totalPages = Math.ceil(filteredData.length / candidatesPerPage);
+  const totalPages = Math.ceil(filteredData.length / limit);
 
   useEffect(() => {
     const getAllCandidates = async () => {
@@ -100,7 +100,7 @@ const TeamsPage = () => {
       </div>
 
       {/* Pagination */}
-      {filteredData.length > candidatesPerPage && (
+      {filteredData.length > limit && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
