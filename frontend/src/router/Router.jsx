@@ -21,6 +21,7 @@ import TeamsPage from "../hr/Teams";
 import ApplicationTracker from "../pages/applications/ApplicationTracker";
 import UserPage from "../pages/user/User";
 import CandidateRegistration from "../pages/registration/Registrations";
+import Profile from "../pages/profile/Profile";
 
 // import UserDashboard from '../pages/UserPage/userDashboard';
 // import SuperAdminPanel from '../pages/SuperAdmin/panel';
@@ -67,6 +68,7 @@ const AppRouter = ({ isAuth }) => {
             <Route path="/settings" element={<HrSettings />} />
             <Route path="/dashboard" element={<HrDashboard />} />
             <Route path="/candidates" element={<CandidateList />} />
+            <Route path="/profile" element={<Profile />} />
             <Route
               path="/application-tracker"
               element={<ApplicationTracker />}

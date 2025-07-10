@@ -38,7 +38,10 @@ const CandidateTable = ({
     );
   };
 
-  const renderStatusBadge = (status) => {
+  const capitalizeFirst = (str) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+
+  const renderStatusBadge = (status, candidate) => {
     let base = "px-3 py-1 rounded-full text-xs font-medium";
     let color = "bg-gray-200 text-gray-700";
 
@@ -60,7 +63,7 @@ const CandidateTable = ({
       <span
         className={`${base} ${color} cursor-pointer`}
         onClick={() => {
-          if (status === "Assigned") navigate("/application-tracker");
+          if (status === "Assigned") navigate("/application-tracker", {state: { candidate } });
         }}
       >
         {status || "Pending"}
@@ -119,7 +122,7 @@ const CandidateTable = ({
                   >
                     {c.experienceYears || "Fresher"}
                   </td>
-                  <td className="px-4 py-3">{renderStatusBadge(c.status)}</td>
+                  <td className="px-4 py-3">{renderStatusBadge(capitalizeFirst(c.status), c)}</td>
 
                   {isAssignedTable && (
                     <>
@@ -192,7 +195,9 @@ const CandidateTable = ({
                   <h3 className="text-lg font-semibold">{c.name}</h3>
                   <p className="text-sm text-gray-500">{c.domain || "—"}</p>
                 </div>
-                {renderStatusBadge(c.status)}
+                <div className="text-sm text-gray-500">
+                  {renderStatusBadge(capitalizeFirst(c.status))}
+                </div>
               </div>
               <div className="text-sm text-gray-700 space-y-1 mb-3">
                 <p>

@@ -90,7 +90,7 @@ const getAllHrs = async (req, res) => {
       {
         _id: 1,
         firstName: 1,
-        lastName :1,
+        lastName: 1,
       }
     );
 
@@ -117,5 +117,17 @@ const getAllHrs = async (req, res) => {
   }
 }
 
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({ role: { $in: ["admin", "hr"] } }, { password: 0 }).lean().exec();
+    if (!users) return res.status(404).json({ message: "No users found." });
 
-module.exports = { registerUser, loginUser, getUserDetailsById, getAllHrs };
+    res.status(200).json({ status: true, data: users });
+  } catch (error) {
+    console.error("Error getting users:", error.message);
+    res.status(500).json({ message: "Error getting users", error: error.message });
+  }
+}
+
+
+module.exports = { registerUser, loginUser, getUserDetailsById, getAllHrs, getAllUsers };
