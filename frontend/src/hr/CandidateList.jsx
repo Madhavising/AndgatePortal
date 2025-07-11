@@ -6,6 +6,7 @@ import { Search } from "lucide-react";
 import { baseUrl } from "../api";
 import CandidateInformation from "../components/CandidateInformation";
 import CandidateTable from "../components/CandidateTable";
+import CandidateFilter from "../components/CandidateFilter";
 
 const CandidateList = () => {
   const token = localStorage.getItem("token");
@@ -14,7 +15,7 @@ const CandidateList = () => {
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selectedRating, setSelectedRating] = useState("");
+  const [filteredCandidates, setFilteredCandidates] = useState([]);
 
   // Capitalize first letter utility
   const capitalizeFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -102,24 +103,6 @@ const CandidateList = () => {
     }
   };
 
-  // Filter candidates based on search term
-  const filteredCandidates = candidates.filter((c) => {
-    const term = searchTerm.toLowerCase();
-    const matchesSearch =
-      c.email.toLowerCase().includes(term) ||
-      c.name.toLowerCase().includes(term) ||
-      c.status.toLowerCase().includes(term) ||
-      c.mobile.toLowerCase().includes(term) ||
-      c.domain.toLowerCase().includes(term) ||
-      c.experienceYears.includes(term);
-
-    const matchesRating = selectedRating
-      ? c.rating >= Number(selectedRating)
-      : true;
-
-    return matchesSearch && matchesRating;
-  });
-
   return (
     <div className="p-4 md:p-6 bg-[#f8fafc] h-full font-inter overflow-x-hidden">
       <div className="max-w-7xl mx-auto">
@@ -129,32 +112,30 @@ const CandidateList = () => {
             <h2 className="text-2xl font-bold text-gray-900">
               Candidate Submission Panel
             </h2>
-
-            {/* Search Input */}
-            <div className="relative w-full md:w-96">
-              <span className="absolute left-3 top-2.5 text-gray-400">
-                <Search size={16} />
-              </span>
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+          </div>
+          {/* Filters */}
+          <div className=" mt-2">
+            <CandidateFilter
+              candidates={candidates}
+              onFilter={setFilteredCandidates}
+            />
           </div>
         </div>
 
         {/* Candidate Table */}
         <div className="overflow-x-auto rounded-xl shadow border border-gray-200 bg-white">
-          <CandidateTable
-            candidates={filteredCandidates}
-            onAssign={handleAssign}
-            onView={setSelectedCandidate}
-            showAssignButton={true}
-            searchTerm={searchTerm}
-          />
+          {filteredCandidates.length > 0 ? (
+            <CandidateTable
+              candidates={filteredCandidates}
+              onAssign={handleAssign}
+              onView={setSelectedCandidate}
+              showAssignButton={true}
+            />
+          ) : (
+            <div className="text-center py-10 text-gray-500 text-sm">
+              No candidates match the selected filters.
+            </div>
+          )}
         </div>
       </div>
 

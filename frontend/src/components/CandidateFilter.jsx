@@ -3,14 +3,15 @@ import React, { useEffect, useState } from "react";
 const CandidateFilter = ({ candidates = [], onFilter }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedDomain, setSelectedDomain] = useState("");
-  const [selectedRating, setSelectedRating] = useState(null);
+  const [selectedStatus, setSelectedStatus] = useState("");
+
   const [selectedExperience, setSelectedExperience] = useState("");
 
   const getFilteredCandidates = (
     candidates,
     searchTerm,
     selectedDomain,
-    selectedRating,
+    selectedStatus,
     selectedExperience
   ) => {
     return candidates.filter((candidate) => {
@@ -37,14 +38,13 @@ const CandidateFilter = ({ candidates = [], onFilter }) => {
         matchesExperience = exp > 3 && exp <= 5;
       else if (selectedExperience === "5+") matchesExperience = exp > 5;
 
-      const rating = Number(candidate.rating) || 0;
-      let matchesRating = true;
-      if (selectedRating !== null) {
-        matchesRating = rating >= selectedRating;
+      let matchesStatus = true;
+      if (selectedStatus) {
+        matchesStatus = candidate.status === selectedStatus;
       }
 
       return (
-        matchesSearch && matchesDomain && matchesRating && matchesExperience
+        matchesSearch && matchesDomain && matchesStatus && matchesExperience
       );
     });
   };
@@ -54,14 +54,14 @@ const CandidateFilter = ({ candidates = [], onFilter }) => {
       candidates,
       searchTerm,
       selectedDomain,
-      selectedRating,
+      selectedStatus,
       selectedExperience
     );
     onFilter(filtered);
   }, [
     searchTerm,
     selectedDomain,
-    selectedRating,
+    selectedStatus,
     selectedExperience,
     candidates,
     onFilter,
@@ -116,23 +116,19 @@ const CandidateFilter = ({ candidates = [], onFilter }) => {
         </select>
       </div>
 
-      {/* Rating */}
+      {/* Status */}
       <div>
-        <label className="block text-sm text-gray-600 mb-1">Rating</label>
+        <label className="block text-sm text-gray-600 mb-1">Status</label>
         <select
-          value={selectedRating === null ? "" : selectedRating}
-          onChange={(e) => {
-            const val = e.target.value;
-            setSelectedRating(val === "" ? null : Number(val));
-          }}
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
           className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:outline-none"
         >
-          <option value="">All Ratings</option>
-          <option value="5">5⭐ only</option>
-          <option value="4">4⭐ & above</option>
-          <option value="3">3⭐ & above</option>
-          <option value="2">2⭐ & above</option>
-          <option value="1">1⭐ only</option>
+          <option value="">All Status</option>
+          <option value="Assigned">Assigned</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Pending">Pending</option>
+          <option value="OnHold">On Hold</option>
         </select>
       </div>
 

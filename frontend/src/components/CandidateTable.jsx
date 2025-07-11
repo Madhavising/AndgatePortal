@@ -63,8 +63,7 @@ const CandidateTable = ({
       <span
         className={`${base} ${color} cursor-pointer`}
         onClick={() => {
-          if (status === "Assigned")
-            navigate("/application-tracker", { state: { candidate } });
+          if (status === "Assigned") navigate("/application-tracker", {state: { candidate } });
         }}
       >
         {status || "Pending"}
@@ -104,9 +103,7 @@ const CandidateTable = ({
                   >
                     {c.name}
                   </td>
-                  <td className="px-4 py-3">
-                    {renderStatusBadge(capitalizeFirst(c.status), c)}
-                  </td>
+                  <td className="px-4 py-3">{renderStatusBadge(capitalizeFirst(c.status), c)}</td>
                   <td
                     className="px-4 py-3 truncate max-w-[190px]"
                     title={c.email}

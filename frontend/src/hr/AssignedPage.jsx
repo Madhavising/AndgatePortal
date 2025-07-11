@@ -153,14 +153,20 @@ const AssignedCandidatePage = () => {
 
           {/* Candidate Table */}
           <div className="w-full bg-white border border-gray-200 shadow-sm rounded-xl">
-            <CandidateTable
-              candidates={filteredCandidates}
-              onView={setSelectedCandidate}
-              showEditButton={true}
-              isAssignedTable={true}
-              onEdit={handleEditClick}
-              selectedRating={selectedRating}
-            />
+            {filteredCandidates.length > 0 ? (
+              <CandidateTable
+                candidates={filteredCandidates}
+                onView={setSelectedCandidate}
+                showEditButton={true}
+                isAssignedTable={true}
+                onEdit={handleEditClick}
+                selectedRating={selectedRating}
+              />
+            ) : (
+              <div className="text-center py-10 text-gray-500 text-sm">
+                No candidates match the selected filters.
+              </div>
+            )}
           </div>
 
           {/* Candidate Info Modal */}

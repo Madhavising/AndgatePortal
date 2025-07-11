@@ -42,17 +42,19 @@ const TeamsPage = () => {
     );
   });
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
+  
   const indexOfLastCandidate = currentPage * limit;
   const indexOfFirstCandidate = indexOfLastCandidate - limit;
   const currentCandidates = filteredData.slice(
     indexOfFirstCandidate,
     indexOfLastCandidate
   );
+  
   const totalPages = Math.ceil(filteredData.length / limit);
+  
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   useEffect(() => {
     const getAllCandidates = async () => {
@@ -100,16 +102,15 @@ const TeamsPage = () => {
       </div>
 
       {/* Pagination */}
-      {filteredData.length > limit && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPrevious={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          onNext={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-        />
-      )}
+ 
+  <Pagination
+    currentPage={currentPage}
+    totalPages={totalPages}
+    onPrevious={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+    onNext={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+  />
+
+
 
       {/* Table (Desktop) */}
       <div className="hidden xl:block mt-2">
