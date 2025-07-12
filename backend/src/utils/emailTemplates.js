@@ -96,4 +96,172 @@ const htmlTemplate = `
         </html>
 `;
 
-module.exports = htmlTemplate;
+const candidateHtml = `
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interview Invitation</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .container {
+      width: 600px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .content {
+      padding: 30px 40px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #2c3e50;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .footer {
+      padding: 20px 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table class="container" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="content">
+              <h2>Interview Invitation</h2>
+              <p>Dear <strong>{{candidate.name}}</strong>,</p>
+              <p>
+                You have been invited for an interview with
+                <strong>{{organization.name}}</strong> for the
+                <strong>{{round}}</strong> round.
+              </p>
+              <p style="margin-top: 20px;">
+                <strong>Interview Date:</strong> {{interviewDate}}<br/>
+                <strong>Meeting Link:</strong>
+                <a href="{{meetingLink}}" target="_blank">Click to Join</a>
+              </p>
+              <p style="margin-top: 40px;">
+                Best regards,<br/>
+                <strong>Andgate HR Team</strong>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="footer">
+              &copy; {{currentYear}} Andgate Informatics Pvt. Ltd. All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+const interviewerHtml = `
+ <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Interview Assignment</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      font-family: Arial, sans-serif;
+      color: #333;
+    }
+    .container {
+      width: 600px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .content {
+      padding: 30px 40px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 24px;
+      color: #2c3e50;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .footer {
+      padding: 20px 40px;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table class="container" cellpadding="0" cellspacing="0">
+          <tr>
+            <td class="content">
+              <h2>Interview Assignment</h2>
+              <p>Dear <strong>{{interviewer.name}}</strong>,</p>
+              <p>
+                You have been assigned to conduct an interview with
+                <strong>{{candidate.name}}</strong> for the
+                <strong>{{round}}</strong> round.
+              </p>
+              <p style="margin-top: 20px;">
+                <strong>Interview Date:</strong> {{interviewDate}}<br/>
+                <strong>Meeting Link:</strong>
+                <a href="{{meetingLink}}" target="_blank">Click to Join</a>
+              </p>
+              <p style="margin-top: 40px;">
+                Best regards,<br/>
+                <strong>Andgate HR Team</strong>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td class="footer">
+              &copy; {{currentYear}} Andgate Informatics Pvt. Ltd. All rights reserved.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+`;
+
+module.exports = {
+    htmlTemplate,
+    candidateHtml,
+    interviewerHtml
+};

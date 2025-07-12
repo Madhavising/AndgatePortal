@@ -5,6 +5,8 @@ const path = require("path");
 const dbConnection = require("./src/db/dbConnection");
 const portalRoutes = require("./src/routes/portalRoutes");
 const authRoutes = require("./src/routes/authRoutes");
+const eventRoute = require("./src/routes/eventRoute");
+const companyRoute = require("./src/routes/companyRoute");
 
 dotenv.config();
 
@@ -32,7 +34,9 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
 app.use("/api/auth", authRoutes);
+app.use("/api", companyRoute);
 app.use("/api", portalRoutes);
+app.use("/api", eventRoute);
 
 app.use("/src/uploads", express.static(path.join(__dirname, "src/uploads")));
 
